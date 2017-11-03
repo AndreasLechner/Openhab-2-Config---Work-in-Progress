@@ -1,0 +1,16 @@
+sitemap YahooWeather label="Wetter" 	{
+ 		// Frame Fritz Box Anruferdaten
+ 		Frame label= "Fritz Box Anruferdaten" 	{ 
+ 				Group item=gFritz label="Fritz!Box"
+ 		}
+ 		// Frame Yahoo Wetter Aschaffenburg
+ 		Frame label= "Yahoo Wetter Daten Aschaffenburg" 	{ 
+ 				Group item=gWeather label="Wetter Aburg"
+ 		}
+ 		// Frame Yahoo Wetter Aschaffenburg 2
+ 		Frame label= "Wetter in Aschaffenburg by Yahoo" 	{
+ 				Text item=Aburg_Temperatur icon="temperature" valuecolor=[>25="red",>15="green",>5="orange",<5="blue"]
+ 				Text item=Aburg_Humidity icon="rain"
+ 				Text item=Aburg_Pressure icon="sun_clouds"
+ 		}
+}

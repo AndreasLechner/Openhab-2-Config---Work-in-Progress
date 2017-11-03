@@ -1,0 +1,16 @@
+import org.joda.time.*
+import org.openhab.core.library.types.*
+import org.openhab.core.persistence.*
+import org.openhab.model.script.actions.*
+
+var Integer sleepDuration = 10
+var Integer timerDuration = 15 
+var Timer timerAway = null
+var Timer timerSleep = null
+
+rule "Switch off Bassbox"
+when
+	Item State_Sleeping changed from OFF to ON
+then
+    Socket_Bassbox.postUpdate(OFF)
+end

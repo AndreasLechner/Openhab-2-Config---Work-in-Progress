@@ -1,0 +1,108 @@
+import org.openhab.core.library.types.*
+import org.openhab.core.persistence.*
+import org.openhab.model.script.actions.*
+
+rule "Window_FF_GuestWC"
+when
+	Item Window_FF_GuestWC changed
+then
+	if( State_Notify.state == ON ) pushover("Fenster: GästeWC " + Window_FF_GuestWC.state )
+end
+
+rule "Window_FF_Kitchen"
+when
+	Item Window_FF_Kitchen changed
+then
+	if( State_Notify.state == ON ) pushover("Fenster: Küche " + Window_FF_Kitchen.state )
+end
+
+rule "Window_FF_Livingroom_Terrace"
+when
+	Item Window_FF_Livingroom_Terrace changed
+then
+	if( State_Notify.state == ON ) pushover("Fenster: Terasse " + Window_FF_Livingroom_Terrace.state )
+end
+
+rule "Window_FF_Livingroom_Couch"
+when
+	Item Window_FF_Livingroom_Couch changed
+then
+	if( State_Notify.state == ON ) pushover("Fenster: Couch " + Window_FF_Livingroom_Couch.state )
+end
+
+rule "Window_FF_Guestroom"
+when
+	Item Window_FF_Guestroom changed
+then
+	if( State_Notify.state == ON ) pushover("Fenster: Gästezimmer " + Window_FF_Guestroom.state )
+end
+
+rule "Door_FF_Floor"
+when
+	Item Door_FF_Floor changed
+then
+	if( State_Notify.state == ON ) pushover("Tür: Haustür " + Door_FF_Floor.state )
+end
+
+rule "Door_FF_Garage1"
+when
+	Item Door_FF_Garage1 changed
+then
+	if( State_Notify.state == ON ) pushover("Tür: Schuppen.Strasse " + Door_FF_Garage1.state )
+end
+
+rule "Door_FF_Garage2"
+when
+	Item Door_FF_Garage2 changed
+then
+	if( State_Notify.state == ON ) pushover("Tür: Schuppen.Garten " + Door_FF_Garage2.state )
+end
+
+rule "Door_FF_Garage2"
+when
+	Item Window_FF_Garage changed
+then
+	if( State_Notify.state == ON ) pushover("Fenster: Schuppen " + Window_FF_Garage.state )
+end
+
+rule "Window_SF_Bathroom"
+when
+	Item Window_SF_Bathroom changed
+then
+	if( State_Notify.state == ON ) pushover("Fenster: Badezimmer " + Window_SF_Bathroom.state )
+end
+
+rule "Window_SF_Dressingroom"
+when
+	Item Window_SF_Dressingroom changed
+then
+	if( State_Notify.state == ON ) pushover("Fenster: Ankleide " + Window_SF_Dressingroom.state )
+end
+
+rule "Window_SF_Bedroom"
+when
+	Item Window_SF_Bedroom changed
+then
+	if( State_Notify.state == ON ) pushover("Fenster: Schlafzimmer " + Window_SF_Bedroom.state )
+end
+
+rule "Window_SF_Child1"
+when
+	Item Window_SF_Child1 changed
+then
+	if( State_Notify.state == ON ) pushover("Fenster: Kind1 " + Window_SF_Child1.state )
+end
+
+rule "Window_SF_Child2"
+when
+	Item Window_SF_Child2 changed
+then
+	if( State_Notify.state == ON ) pushover("Fenster: Kind2 " + Window_SF_Child2.state )
+end
+
+rule "Window_SF_Attic"
+when
+	Item Window_SF_Attic changed
+then
+	if( State_Notify.state == ON ) pushover("Fenster: Dachboden " + Window_SF_Attic.state )
+end

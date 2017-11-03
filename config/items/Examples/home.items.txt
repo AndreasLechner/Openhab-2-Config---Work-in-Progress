@@ -1,0 +1,227 @@
+Group gDG										"Dachgeschoss"							<secondfloor>
+Group gOG 										"Obergeschoss"							<firstfloor>
+Group gEG 										"Erdgeschoss"							<groundfloor>
+Group gGA	 									"Garten"								<garden>
+
+/* Gruppe Erdgeschoss */
+Group EG_GaesteWC 								"Gäste WC" 								<bath> 			(gEG)
+Group EG_Buero		 							"Büro" 									<office> 		(gEG)
+Group EG_Werkstatt						    	"Werkstatt" 							<office> 		(gEG)
+Group EG_Heizung								"Heizung" 								<office> 		(gEG)
+Group EG_Oelraum								"Ölraum"								<boilerroom>  	(gEG)  
+Group EG_Eingang    							"Flur" 									<corridor> 		(gEG)
+
+/* Gruppe Garten */
+Group GA_Garage									"Garage" 								<garage> 		(gGA)
+Group GA_Schuppen								"Schuppen"								<garage2>		(gGA)
+
+/* Gruppe Obergeschoss */
+Group OG_Bad 									"Badezimmer" 							<bath> 			(gOG)
+Group OG_Ankleide 								"Ankleide" 								<wardrobe> 		(gOG)
+Group OG_Schlafzimmer 							"Schlafzimmer" 							<bedroom> 		(gOG)
+Group OG_Kueche									"Kueche" 								<kitchen>		(gOG)
+Group OG_Esszimmer 								"Esszimmer" 							<dining> 		(gOG)
+Group OG_Flur 	    							"Flur" 									<corridor> 		(gOG)
+Group OG_Wohnzimmer								"Wohnzimmer" 							<living> 		(gOG)
+Group OG_Balkon									"Balkon"								<balcony>		(gOG)
+
+
+/* Lights */
+Group:Switch:OR(ON, OFF) Lights 				"Alle Lampen [%d]"						<selfLight>		(Alle)
+Group:Switch:OR(ON, OFF) Lights_Indoor 			"Innen Lampen [%d]"						<selfLight>		(Lights)
+Group:Switch:OR(ON, OFF) Lights_Outdoor 		"Aussen Lampen [%d]" 					<selfLight>		(Lights)
+Group:Switch:OR(ON, OFF) Lights_EG 				"EG Lampen [%d]" 						<selfLight>		(Lights_Indoor_EG)
+Group:Switch:OR(ON, OFF) Lights_OG 				"OG Lampen [%d]" 						<selfLight>		(Lights_Indoor_OG)
+Group:Switch:OR(ON, OFF) Lights_DG 				"DG Lampen [%d]" 						<selfLight>		(Lights_Indoor_DG)
+
+
+/* Switch Erdgeschoss */
+Switch Light_FF_Floor_Ceiling 					"Flur EG Decke" 						<selfLight>		(FF_Floor, Lights_FF)				{ knx="0/0/26+<0/0/27" }
+Switch Light_FF_Floor_Mirror 					"Flur EG Spiegel" 						<selfLight>		(FF_Floor, Lights_FF)				{ knx="0/0/28+<0/0/29" }
+Switch Light_FF_Kitchen_Cupboard 				"Küche Schrank" 						<selfLight>		(FF_Kitchen, Lights_FF)				{ knx="0/0/6+<0/0/7" }
+Switch Light_FF_Kitchen_Bar 					"Küche Tresen" 							<selfLight>		(FF_Kitchen, Lights_FF)				{ knx="0/0/4+<0/0/5" }
+Switch Light_FF_Boxroom_Ceiling 				"Abstellkammer" 						<selfLight>		(FF_Boxroom, Lights_FF)				{ knx="0/0/16+<0/0/17" }
+Switch Light_FF_Utilityroom_Ceiling 			"HWR" 									<selfLight>		(FF_Utilityroom, Lights_FF)			{ knx="0/0/18+<0/0/19" }
+Switch Light_FF_Guestroom_Ceiling 				"Gästezimmer" 							<selfLight>		(FF_Guestroom, Lights_FF)			{ knx="0/0/24+<0/0/25" }
+Switch Light_FF_GuestWC_Ceiling 				"Gäste WC Decke" 						<selfLight>		(FF_GuestWC, Lights_FF)				{ knx="0/0/20+<0/0/21" }
+Switch Light_FF_GuestWC_Mirror 					"Gäste WC Spiegel" 						<selfLight>		(FF_GuestWC, Lights_FF)				{ knx="0/0/22+<0/0/23" }
+Switch Light_FF_Garage 							"Schuppen" 								<selfLight>		(FF_Garage, Lights_FF)				{ knx="0/0/14+<0/0/15" }
+
+
+/* Dimmer Erdgeschoss */
+Dimmer Light_FF_Livingroom_Diningtable 			"Wohnz. Esstisch [%d %%]"				<selfSlider>	(FF_Livingroom, Lights_FF)			{ knx="0/0/8, 0/0/9, 0/0/32+<0/0/33" }
+Dimmer Light_FF_Livingroom_Couch 				"Wohnz. Couch [%d %%]" 					<selfSlider>	(FF_Livingroom, Lights_FF)			{ knx="0/0/11, 0/0/12, 0/0/34+<0/0/35" }
+Dimmer Light_FF_Livingroom_Brightness_Standard	"Wohnz. Indirekt [%d %%]"   			<selfLight>		(FF_Livingroom, Lights_FF)
+Dimmer Light_FF_Livingroom_Brightness_Standard1	"Lampe 1 [%d %%]"						<selfLight>											{ hue="1;brightness;30"}
+Dimmer Light_FF_Livingroom_Brightness_Standard2	"Lampe 2 [%d %%]"						<selfLight>											{ hue="2;brightness;30"}
+Dimmer Light_FF_Livingroom_Brightness_Standard3	"Lampe 3 [%d %%]"						<selfLight>											{ hue="3;brightness;30"}
+Dimmer Light_FF_Kitchen_Ceiling 				"Küche Decke [%d %%]" 					<selfSlider>	(FF_Kitchen, Lights_FF)				{ knx="0/0/1, 0/0/2, 0/0/30+<0/0/31" }
+
+
+/* Farbwechsler Erdgeschoss */
+Color Light_EG_Livingroom_Color_Standard		"Alle Lampen"							<colorwheel>
+Color Light_EG_Livingroom_Color_Standard1		"Lampe 1"								<colorwheel>										{ hue="1"}
+Color Light_EG_Livingroom_Color_Standard2		"Lampe 2"								<colorwheel>										{ hue="2"}
+Color Light_Eg_Livingroom_Color_Standard3		"Lampe 3"								<colorwheel>										{ hue="3"}
+
+									
+/* Switch Obergeschoss */
+Switch Light_OG_Floor_Ceiling 					"Flur OG" 								<selfLight>		(SF_Floor, Lights_SF)				{ knx="1/0/0+<1/0/1" }
+Switch Light_OG_Bedroom_Ceiling 				"Schlafz. Decke"						<selfLight>		(SF_Bedroom, Lights_SF)				{ knx="1/0/8+<1/0/9" }
+Switch Light_OG_Bedroom_Left 					"Schlafz. Bett Fenster" 				<selfLight>		(SF_Bedroom, Lights_SF)				{ knx="1/1/4+<1/1/5" }
+Switch Light_OG_Bedroom_Right 					"Schlafz. Bett Wand" 					<selfLight>		(SF_Bedroom, Lights_SF)				{ knx="1/1/6+<1/1/7" }
+Switch Light_OG_Dressingroom_Ceiling			"Ankleide" 								<selfLight>		(SF_Dressingroom, Lights_SF)		{ knx="1/0/6+<1/0/7" }
+Switch Light_OG_Child1_Ceiling 					"Kind 1" 								<selfLight>		(SF_Child1, Lights_SF)				{ knx="1/0/10+<1/0/11" }
+Switch Light_OG_Child2_Ceiling 					"Kind 2" 								<selfLight>		(SF_Child2, Lights_SF)				{ knx="1/0/12+<1/0/13" }
+Switch Light_OG_Bathroom_Ceiling 				"Badezimmer Decke" 						<selfLight>		(SF_Bathroom, Lights_SF)			{ knx="1/0/2+<1/0/3" }
+Switch Light_OG_Bathroom_Mirror 				"Badezimmer Spiegel"					<selfLight>		(SF_Bathroom, Lights_SF)			{ knx="1/0/4+<1/0/5" }
+
+
+/* Switch Dachgeschoss */
+Switch Light_DG_Attic 							"Dachboden" 							<selfLight>		(SF_Attic, Lights_SF)				{ knx="1/0/14+<1/0/15" }
+
+
+/* Switch Aussenbereich */
+Switch Light_Outdoor_Frontdoor_Manual 			"Haustür" 								<selfLight>		(Outdoor, Lights_Outdoor)
+Switch Light_Outdoor_Carport_Manual 			"Carport" 								<selfLight>		(Outdoor, Lights_Outdoor)
+Switch Light_Outdoor_Garage_Streedside_Manual 	"Schuppentür vorne" 					<selfLight>		(Outdoor, Lights_Outdoor)
+Switch Light_Outdoor_Garage_Gardenside_Manual 	"Schuppentür hinten" 					<selfLight>		(Outdoor, Lights_Outdoor)
+Switch Light_Outdoor_Frontdoor 															<selfLight>											{ knx="2/0/3+<2/0/4" }
+Switch Light_Outdoor_Carport 															<selfLight>											{ knx="2/0/6+<2/0/7" }
+Switch Light_Outdoor_Garage_Streedside 													<selfLight>											{ knx="2/0/0+<2/0/1" }
+Switch Light_Outdoor_Garage_Gardenside 													<selfLight>											{ knx="2/0/9+<2/0/10" }
+
+/* Dimmer Aussenbereich */
+Dimmer Light_Outdoor_Terrace_Manual 			"Terasse [%d %%]"						<selfSlider>	(Outdoor, Lights_Outdoor)
+Dimmer Light_Outdoor_Terrace 															<selfSlider>										{ knx="2/0/12+<2/0/13, 2/0/16, 2/0/17+<2/0/18" }
+
+
+/* Group Sockets */
+Group:Switch:OR(ON, OFF) Sockets 				"Steckdosen Ergeschoss"					<selfSocket>
+
+/* Socket Switches Ergeschoss */
+Switch Socket_Bassbox 							"Bassbox"								<selfSocket>	(FF_Livingroom,Sockets)				{ knx="0/1/3+<0/1/4" }
+Switch Socket_Livingroom 						"Wohnz. neben Stehlampe"				<selfSocket>	(FF_Livingroom,Sockets)				{ knx="0/1/5+<0/1/6" }
+
+/* Socket Switches Obergeschoss */
+Switch Socket_Floor 							"Flur neben Telefon"					<selfSocket>	(FF_Floor,Sockets)					{ knx="0/1/7+<0/1/8" }
+Switch Socket_GuestWC 							"WC Radio"								<selfSocket>	(FF_GuestWC,Sockets)				{ knx="0/1/1+<0/1/2" }
+
+/* Socket Switch Dachgeschoss */
+Switch Socket_Attic								"Dachboden"								<selfSocket>	(SF_Attic,Sockets)					{ knx="1/1/8+<1/1/9" }
+
+/* Socket Switch Aussenbereich*/
+Switch Socket_Streedside						"Aussen vorne"							<selfSocket>	(Outdoor,Sockets)					{ knx="2/1/0+<2/1/1" }
+Switch Socket_Gardenside						"Aussen hinten"							<selfSocket>	(Outdoor,Sockets)					{ knx="2/1/2+<2/1/3" }
+
+
+/* Shutters Gruppen*/
+Group:Rollershutter:OR(UP, DOWN)	Shutters	"Alle Rollläden [%d]"					<selfRollershutter>	(Alle)
+Group:Rollershutter:OR(UP, DOWN)	Shutters_FF	"EG Rollläden [%d]" 					<selfRollershutter>	(Shutters)
+Group:Rollershutter:OR(UP, DOWN)	Shutters_SF	"OG Rollläden [%d]" 					<selfRollershutter>	(Shutters)
+
+
+
+/* Shutters Erdgeschoss */
+Rollershutter Shutters_FF_Livingroom_Terrace 	"Terasse"								<selfRollershutter>	(FF_Livingroom, Shutters_FF)	{ knx="0/2/4, 0/2/5, +<0/2/6" }
+Rollershutter Shutters_FF_Livingroom_Couch   	"Couch"									<selfRollershutter>	(FF_Livingroom, Shutters_FF)	{ knx="0/2/7, 0/2/8, +<0/2/9" }
+Rollershutter Shutters_FF_Kitchen 				"Küche"									<selfRollershutter>	(FF_Kitchen, Shutters_FF)		{ knx="0/2/1, 0/2/2, +<0/2/3" }
+Rollershutter Shutters_FF_Guestroom 			"Gästezimmer"							<selfRollershutter>	(FF_Guestroom, Shutters_FF)		{ knx="0/2/13, 0/2/14, +<0/2/15" }
+Rollershutter Shutters_FF_GuestWC 				"Gäste WC"								<selfRollershutter>	(FF_GuestWC, Shutters_FF)		{ knx="0/2/10, 0/2/11, +<0/2/12" }
+
+/* Shutters Obergeschoss */
+Rollershutter Shutters_OG_Bedroom 				"Schlafzimmer"							<selfRollershutter>	(SF_Bedroom, Shutters_SF)		{ knx="1/2/7, 1/2/8, +<1/2/9" }
+Rollershutter Shutters_OG_Dressingroom 			"Ankleide"								<selfRollershutter>	(SF_Dressingroom, Shutters_SF)	{ knx="1/2/4, 1/2/5, +<1/2/6" }
+Rollershutter Shutters_OG_Child1 				"Kind 1"								<selfRollershutter>	(SF_Child1, Shutters_SF)		{ knx="1/2/10, 1/2/11, +<1/2/12" }
+Rollershutter Shutters_OG_Child2 				"Kind 2"								<selfRollershutter>	(SF_Child2, Shutters_SF)		{ knx="1/2/13, 1/2/14, +<1/2/15" }
+Rollershutter Shutters_OG_Bathroom 				"Badezimmer"							<selfRollershutter>	(SF_Bathroom, Shutters_SF)		{ knx="1/2/1, 1/2/2, +<1/2/3" }
+
+/* Shutters Dachgeschoss */
+Rollershutter Shutters_SF_Attic 				"Dachboden"								<selfRollershutter>	(SF_Attic, Shutters_SF)			{ knx="1/2/16, 1/2/17, +<1/2/18" }
+
+
+/* Fenster Gruppen Kontakt abfrage */
+Group:Contact:OR(OPEN, CLOSED)	Security 		"Sicherheit [%d]"						<shield>		(Alle)
+Group:Contact:OR(OPEN, CLOSED)	Openingcontacts	"Öffnungssensoren [%d]"					<shield>		(Alle)
+Group:Contact:OR(OPEN, CLOSED) 	Sensor_Outdoor	"Aussen Bewegungsmelder [%d]"			<selfMotion>	(Security)
+Group:Contact:OR(OPEN, CLOSED) 	Sensor_Indoor	"EG Bewegungsmelder [%d]"				<selfMotion>	(Security)
+Group:Contact:OR(OPEN, CLOSED) 	Sensor_Doors_FF	"EG Türen [%d]"							<door>			(Security,Openingcontacts)
+Group:Contact:OR(OPEN, CLOSED) 	Sensor_Window_FF	"EG Fenster [%d]"					<contact>		(Security,Openingcontacts)
+Group:Contact:OR(OPEN, CLOSED) 	Sensor_Window_SF	"OG Fenster [%d]"					<contact>		(Security,Openingcontacts)
+
+/* Gruppe Switch Motiondetektor */
+Group:Switch:OR(ON, OFF) 	Motiondetector_Switch 		"Gartenlicht Details. [MAP(motiondetector_switch_de.map):%d]" <selfLightInfo>	(Security)
+
+
+/* Zeitabfrage für die Änderung der letzten Sicherheit */
+DateTime Security_Last_Change					"Sicherheit [%1$tH:%1$tM:%1$tS, %1$td.%1$tm]"	<selfCalendar>	(Security)
+
+
+/* Schalter Status Abfrage */
+Switch State_Notify								"Benachrichtigen"						<selfShield> 	(Security) 							{ knx="<0/4/1" }
+Switch State_Holiday							"Urlaubsmodus" 							<selfShield> 	(Security) 							{ knx="<0/4/8" }
+
+
+/* Schalter für Motiondetektoren*/
+Switch Motiondetector_Outdoor_Switch 			"Gartenlicht autom."					<selfLightMotion>	(Security)						{ knx="<2/0/30" }
+Switch Motiondetector_Outdoor_Garage_Streetside_Switch	"Schuppen vorne" 				<selfLightMotion>	(Motiondetector_Switch)
+Switch Motiondetector_Outdoor_Frontdoor_Switch 	"Haustuer" 								<selfLightMotion> 		(Motiondetector_Switch)
+Switch Motiondetector_Outdoor_Carport_Switch 	"Carport"								<selfLightMotion> 		(Motiondetector_Switch)
+Switch Motiondetector_Outdoor_Terrace_Switch 	"Terasse"								<selfLightMotion> 		(Motiondetector_Switch)
+Switch Motiondetector_Outdoor_Garage_Gardenside_Switch	"Schuppen hinten"				<selfLightMotion>	(Motiondetector_Switch)
+
+
+
+/* Motiondetektoren*/
+Contact Motiondetector_GA_Terrace1			"Terasse 1 [MAP(motion_de.map):%s]"			<selfMotion> 	(Outdoor, Sensor_Outdoor)			{ knx="<2/0/14" }
+Contact Motiondetector_GA_Terrace2			"Terasse 2 [MAP(motion_de.map):%s]"			<selfMotion> 	(Outdoor, Sensor_Outdoor)			{ knx="<2/0/15" }
+Contact Motiondetector_GA_Frontdoor 		"Haustür [MAP(motion_de.map):%s]"			<selfMotion> 	(Outdoor, Sensor_Outdoor)			{ knx="<2/0/5" }
+Contact Motiondetector_GA_Carport 			"Carport [MAP(motion_de.map):%s]"			<selfMotion> 	(Outdoor, Sensor_Outdoor)			{ knx="<2/0/8" }
+Contact Motiondetector_GA_Garage_Front 		"Schuppen (vorne) [MAP(motion_de.map):%s]"	<selfMotion> (Outdoor, Sensor_Outdoor)		{ knx="<2/0/2" }
+Contact Motiondetector_GA_Garage_Back	 	"Schuppen (hinten) [MAP(motion_de.map):%s]"	<selfMotion> (Outdoor, Sensor_Outdoor)		{ knx="<2/0/11" }
+
+Contact Motiondetector_FF_Livingroom			"Wohnzimmer [MAP(motion_de.map):%s]"	<selfMotion>	(FF_Livingroom,Sensor_Indoor)		{ knx="<0/4/2" }
+Contact Motiondetector_FF_Floor 				"Flur [MAP(motion_de.map):%s]" 			<selfMotion>	(FF_Floor,Sensor_Indoor)			{ knx="<0/4/3" }
+
+
+/* Tür Sensoren */
+Contact Door_FF_Floor 							"Haustür [MAP(de.map):%s]" 				<door>			(FF_Floor,Sensor_Doors_FF)			{ knx="<0/3/5" }
+Contact Door_FF_Garage1 						"Schuppentür Strasse [MAP(de.map):%s]" 	<door>			(FF_Garage,Sensor_Doors_FF)			{ knx="<0/3/6" }
+Contact Door_FF_Garage2 						"Schuppentür Garten [MAP(de.map):%s]" 	<door>			(FF_Garage,Sensor_Doors_FF)			{ knx="<0/3/7" }
+
+
+/* Fenster Sensoren Erdgeschoss */
+Contact Window_EG_Livingroom_Terrace 			"Terasse [MAP(de.map):%s]" 								(FF_Livingroom,Sensor_Window_FF)	{ knx="<0/3/2" }
+Contact Window_EG_Livingroom_Couch   			"Couch [MAP(de.map):%s]"								(FF_Livingroom,Sensor_Window_FF)	{ knx="<0/3/3" }
+Contact Window_EG_Kitchen 						"Küche [MAP(de.map):%s]"								(FF_Kitchen,Sensor_Window_FF)		{ knx="<0/3/1" }
+Contact Window_EG_Guestroom						"Gästezimmer [MAP(de.map):%s]"							(FF_Guestroom,Sensor_Window_FF)		{ knx="<0/3/4" }
+Contact Window_EG_GuestWC 						"Gäste WC [MAP(de.map):%s]"								(FF_GuestWC, Sensor_Window_FF)		{ knx="<0/3/0" }
+
+/* Fenster Sensoren Obergeschoss */
+Contact Window_OG_Bed 							"Schlafzimmer [MAP(de.map):%s]"							(SF_Bedroom,Sensor_Window_SF)		{ knx="<1/3/2" }
+Contact Window_OG_Dressing 						"Ankleide [MAP(de.map):%s]"								(SF_Dressingroom,Sensor_Window_SF)	{ knx="<1/3/1" }
+
+/* Fenster Sensoren Dachgeschoss */
+Contact Window_DG_Attic 						"Dachboden [MAP(de.map):%s]"							(SF_Attic,Sensor_Window_SF)			{ knx="<1/3/5" }
+
+/* Türklingel */
+Contact 	Bell 																															{ knx="<0/4/7" }
+DateTime	Bell_Last_Change					"Klingel [%1$tH:%1$tM:%1$tS, %1$td.%1$tm]"	<selfBell> 	(Security)
+
+Switch 		Dooropener_FF_Floor 				"Türöffner" 							<selfKey> 		(FF_Floor)							{ knx="0/4/4" }
+Switch 		Dooropener_Timer 					"Türoffner" 							<selfKey> 		(FF_Floor)
+
+/* Watering Aussenbereich */
+Group 		Watering 							"Bewässerung [%d]" 						<selfWater>		(Alle)
+Group:Switch:OR(ON, OFF) Watering_Circuits 		"Bewässerung [%d]" 						<selfWater>		(Watering)
+
+Switch Watering_Gardenside_Lawn_left			"Garten - Rasen links"					<selfWater>		(Watering_Circuits)					{ knx="2/3/0+<2/3/1" }
+Switch Watering_Gardenside_Lawn_right			"Garten - Rasen rechts"					<selfWater>		(Watering_Circuits)					{ knx="2/3/2+<2/3/3" }
+Switch Watering_Gardenside_Beds_Terrace			"Garten - Terasse"						<selfWater>		(Watering_Circuits)					{ knx="2/3/4+<2/3/5" }
+Switch Watering_Gardenside_Beds_behind			"Garten - Beete hinten"					<selfWater>		(Watering_Circuits)					{ knx="2/3/6+<2/3/7" }
+Switch Watering_Streetside_Lawn					"Strasse - Rasen"						<selfWater>		(Watering_Circuits)					{ knx="2/3/8+<2/3/9" }
+Switch Watering_Streetside_Beds					"Strasse - Beete"						<selfWater>		(Watering_Circuits)					{ knx="2/3/10+<2/3/11" }
+
+Number Watering_Program_Duration				"Programm Dauer [%d]"					<selfRuntime>	(Watering)
+Switch Watering_Program_Start					"Programm starten"						<selfAutoMode>	(Watering)
+String Watering_Program_State					"Status [%s]"							<selfInfo>		(Watering)

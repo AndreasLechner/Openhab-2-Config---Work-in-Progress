@@ -1,0 +1,107 @@
+import org.openhab.core.library.types.*
+import org.openhab.core.persistence.*
+import org.openhab.model.script.actions.*
+import java.lang.Math
+
+var Timer beregnungsProgressTimer
+var Timer beregnungsStepTimer
+var Number beregnungsStepEnde
+
+rule "Init wathering" 
+when
+	System started
+then
+	postUpdate(Watering_Program_Duration,20)
+	postUpdate(Watering_Program_State,"läuft nicht" )
+	postUpdate(Watering_Program_Start,OFF)
+	beregnungsStepTimer = null
+end
+
+rule "Wathering program" 
+when
+	Item Watering_Program_Start changed
+then
+
+	if(beregnungsStepTimer!=null) 
+	{
+		beregnungsStepTimer.cancel
+		beregnungsStepTimer = null
+		Watering_Circuits.members.forEach(kreis|
+			postUpdate(kreis, OFF)
+		)
+		postUpdate(Watering_Program_State,"läuft nicht" )
+	}
+	
+	if( Watering_Program_Start.state == ON )
+	{
+		var ende = now
+		beregnungsStepEnde = 0
+		beregnungsStepTimer = createTimer(ende) [|
+		
+			if(beregnungsStepEnde==0)
+			{
+				sendCommand(Watering_Gardenside_Lawn_left,ON)
+				ende = now.plusMinutes((Watering_Program_Duration.state as DecimalType).intValue())
+			}
+			else if( Watering_Gardenside_Lawn_left.state == ON )
+			{
+				sendCommand(Watering_Gardenside_Lawn_right,ON)
+				sendCommand(Watering_Gardenside_Lawn_left,OFF)
+				ende = now.plusMinutes((Watering_Program_Duration.state as DecimalType).intValue())
+			}
+			else if( Watering_Gardenside_Lawn_right.state == ON )
+			{
+				sendCommand(Watering_Streetside_Lawn,ON)
+				sendCommand(Watering_Gardenside_Lawn_right,OFF)
+				ende = now.plusMinutes((Watering_Program_Duration.state as DecimalType).intValue() / 3 * 2)
+			}
+			else if( Watering_Streetside_Lawn.state == ON )
+			{
+				sendCommand(Watering_Streetside_Lawn,OFF)
+			}
+			
+			if( ende != null )
+			{
+				beregnungsStepEnde = ende.millis
+				beregnungsStepTimer.reschedule(ende)
+				ende = null
+			}
+			else
+			{
+				beregnungsStepTimer = null
+				beregnungsProgressTimer = null
+				postUpdate(Watering_Program_Start,OFF)
+				postUpdate(Watering_Program_State,"läuft nicht" )
+				Watering_Circuits.members.forEach(kreis|
+					postUpdate(kreis, OFF)
+				)
+			}
+		]
+		
+		beregnungsProgressTimer = createTimer(now.plusMinutes(1)) [|
+
+			var String msg = ""
+	
+			if( Watering_Gardenside_Lawn_left.state == ON ) msg = "Garten links "
+			else if( Watering_Gardenside_Lawn_right.state == ON ) msg = "Garten rechts "
+			else if( Watering_Streetside_Lawn.state == ON ) msg = "Strasse "
+		
+			var Number diffInMinutes = Math::floor(((beregnungsStepEnde - now.millis) / 1000 / 60).doubleValue)
+		
+			if( diffInMinutes > 0 )
+			{
+				msg = msg + "noch " + diffInMinutes.intValue + " min"
+			}
+			else
+			{
+				msg = msg + "gleich fertig"
+			}
+			
+			if( beregnungsStepTimer != null )
+			{
+				postUpdate(Watering_Program_State,msg )
+				beregnungsProgressTimer.reschedule(now.plusMinutes(1))
+			}
+		]
+	}
+end

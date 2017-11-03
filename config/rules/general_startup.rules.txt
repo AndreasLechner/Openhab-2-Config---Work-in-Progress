@@ -1,0 +1,28 @@
+import org.openhab.core.library.types.*
+import org.openhab.core.persistence.*
+import org.openhab.model.script.actions.*
+import java.lang.Math
+
+rule "Startup init"
+when
+	System started
+then
+
+	logInfo("Startup","Value Initialization")
+
+	postUpdate(Ventilation_Auto_Mode,1)
+	postUpdate(Heating_Auto_Mode,1)
+
+	postUpdate(Motiondetector_Outdoor_Switch,ON)
+	postUpdate(Motiondetector_Outdoor_Garage_Streetside_Switch,ON)
+	postUpdate(Motiondetector_Outdoor_Frontdoor_Switch,ON)
+	postUpdate(Motiondetector_Outdoor_Carport_Switch,ON)
+	postUpdate(Motiondetector_Outdoor_Terrace_Switch,ON)
+	postUpdate(Motiondetector_Outdoor_Garage_Gardenside_Switch,ON)
+	
+	postUpdate(Lights_Outdoor,OFF)
+	postUpdate(Light_Outdoor_Terrace_Manual,OFF)
+	postUpdate(Light_Outdoor_Terrace_Manual,0)
+
+	postUpdate(Auto_Attic_Light,1)
+end

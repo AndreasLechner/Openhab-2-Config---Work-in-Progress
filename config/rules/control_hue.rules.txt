@@ -1,0 +1,70 @@
+import org.openhab.core.library.types.*
+import org.openhab.core.persistence.*
+import org.openhab.model.script.actions.*
+import java.lang.Math
+
+// 76.43406593406592719475156627595424652099609375,90,64
+
+rule "Hue brightness changed"
+when
+	Item Light_FF_Livingroom_Brightness_Standard changed
+then
+	if( 
+		Light_FF_Livingroom_Brightness_Standard.state != Light_FF_Livingroom_Brightness_Standard1.state 
+		&&
+		Light_FF_Livingroom_Brightness_Standard.state != Light_FF_Livingroom_Brightness_Standard2.state
+		&&
+		Light_FF_Livingroom_Brightness_Standard.state != Light_FF_Livingroom_Brightness_Standard3.state
+	)
+	{
+		sendCommand(Light_FF_Livingroom_Brightness_Standard1,Light_FF_Livingroom_Brightness_Standard.state as DecimalType )
+		sendCommand(Light_FF_Livingroom_Brightness_Standard2,Light_FF_Livingroom_Brightness_Standard.state as DecimalType )
+		sendCommand(Light_FF_Livingroom_Brightness_Standard3,Light_FF_Livingroom_Brightness_Standard.state as DecimalType )
+	}
+end
+
+rule "Hue color changed"
+when
+	Item Light_FF_Livingroom_Color_Standard changed
+then
+	var HSBType color = Light_FF_Livingroom_Color_Standard.state as HSBType
+	sendCommand(Light_FF_Livingroom_Color_Standard1,color )
+	sendCommand(Light_FF_Livingroom_Color_Standard2,color )
+	sendCommand(Light_FF_Livingroom_Color_Standard3,color )
+end
+
+rule "Hue brightness changed backward"
+when
+	Item Light_FF_Livingroom_Brightness_Standard1 changed
+	or
+	Item Light_FF_Livingroom_Brightness_Standard2 changed
+	or
+	Item Light_FF_Livingroom_Brightness_Standard3 changed
+then
+	if( 
+		Light_FF_Livingroom_Brightness_Standard.state != Light_FF_Livingroom_Brightness_Standard1.state 
+		&&
+		Light_FF_Livingroom_Brightness_Standard.state != Light_FF_Livingroom_Brightness_Standard2.state
+		&&
+		Light_FF_Livingroom_Brightness_Standard.state != Light_FF_Livingroom_Brightness_Standard3.state
+	)
+	{
+		var Number brightness = Light_FF_Livingroom_Brightness_Standard1.state
+		if( brightness < Light_FF_Livingroom_Brightness_Standard2.state ) brightness = Light_FF_Livingroom_Brightness_Standard2.state
+		if( brightness < Light_FF_Livingroom_Brightness_Standard3.state ) brightness = Light_FF_Livingroom_Brightness_Standard3.state
+		
+		//logInfo("test1",""+(Light_FF_Livingroom_Brightness_Standard.state as DecimalType != brightness)
+		
+		if( Light_FF_Livingroom_Brightness_Standard.state as DecimalType != brightness )
+		{
+			//logInfo("test2",""+Light_FF_Livingroom_Brightness_Standard.state)
+			//logInfo("test3",""+brightness)
+			
+			sendCommand(Light_FF_Livingroom_Brightness_Standard,brightness)
+		}
+	}
+	//else
+	//{
+	//	logInfo("test4","XXXXX")
+	//}
+end

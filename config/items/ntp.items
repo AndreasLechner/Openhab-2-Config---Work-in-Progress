@@ -1,0 +1,28 @@
+/* File: 			Ntp.items
+ * Autor: 			Andreas Lechner
+ * Company: 		IT Lechner
+ * Date:			26-10-2017
+ * Info:			http://www.lechnerandreas.com
+ * Description: 	DE:		In dieser Datei werden die Items für den NTP Zeit/Datum definiert 
+ * 					EN:		This file contains items definitions for Time/Date
+ */
+
+/* ITEM DEFINITION NTP */
+
+
+// Group Definitions
+Group 		gDatumZeit 		"Datum & Uhrzeit"			(gAlle)
+Group 		gZeit			"Zeit Informationen"		(gAlle)
+Group		gDatum			"Datum Informationen"		(gAlle)
+
+// DateTime Definitions
+DateTime 	DateTime_DatumZeitBerlin 		"Datum & Uhrzeit Berlin: [%1$tA, %1$td.%1$tm.%1$tY %1$tT]"  	<clock>		(gDatumZeit, gInfo)   	{ channel="ntp:ntp:berlin:dateTime" }
+DateTime 	DateTime_DatumZeitLondon 		"Datum & Uhrzeit London: [%1$tA, %1$td.%1$tm.%1$tY %1$tT]"  	<clock>		(gDatumZeit, gInfo)   	{ channel="ntp:ntp:london:dateTime" }
+DateTime 	DateTime_DatumZeitNewYork 		"Datum & Uhrzeit New York: [%1$tA, %1$td.%1$tm.%1$tY %1$tT]"  	<clock>		(gDatumZeit, gInfo)   	{ channel="ntp:ntp:newyork:dateTime" }
+DateTime    DateTime_DatumZeitAktuell     	"Heute [%1$tA, %1$td.%1$tm.%1$tY]"                 				<clock>  	(gDatumZeit, gInfo) 			{ channel="ntp:ntp:local:dateTime"}
+
+
+// String Definitions
+String 		String_ZeitLokal				"Lokale Uhrzeit: [%1$tT]"  										<clock>		(gZeit, gInfo)   		{ channel="ntp:ntp:local:dateTime" }
+String 		String_DatumLokal				"Lokales Datum: [%1$tA, %1$td.%1$tm.%1$tY]"  					<clock>		(gDatum, gInfo)   		{ channel="ntp:ntp:local:dateTime" }
+String 		String_Wochentag				"Wochentag: [%1$tA]"  											<clock>		(gDatum, gInfo)   		{ channel="ntp:ntp:local:dateTime" }

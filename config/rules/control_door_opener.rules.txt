@@ -1,0 +1,39 @@
+import org.openhab.core.library.types.*
+import org.openhab.core.persistence.*
+import org.openhab.model.script.actions.*
+ 
+var Timer openTimer = null
+
+rule "Door opener" 
+when
+	Item Dooropener_Timer changed
+then
+
+	if( Dooropener_Timer.state == ON )
+	{
+		postUpdate(Dooropener_FF_Floor,ON)
+		
+		if(openTimer==null) 
+		{
+			openTimer = createTimer(now.plusSeconds(3)) [|
+				openTimer=null
+				postUpdate(Dooropener_FF_Floor,OFF)
+				postUpdate(Dooropener_Timer,OFF)
+			]
+		}
+		else
+		{
+			// subsequent ON command, so reschedule the existing timer
+			openTimer.reschedule(now.plusSeconds(3))
+		}
+	}
+	else if( Dooropener_FF_Floor.state == ON )
+	{
+		if(openTimer!=null)
+		{
+			openTimer.cancel()
+			openTimer=null
+		}
+		postUpdate(Dooropener_FF_Floor,OFF)
+	}
+end

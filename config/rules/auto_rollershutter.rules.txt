@@ -1,0 +1,29 @@
+import org.openhab.core.library.types.*
+import org.openhab.core.persistence.*
+import org.openhab.model.script.actions.*
+import java.lang.Math
+
+rule "Rollershutter auto"
+when
+	Item State_Rollershutter changed
+then
+	if( Auto_Rollershutter.state == ON && State_Away.state == ON && State_Rollershutter.state != Uninitialized )
+	{
+		if( State_Rollershutter.state == ON )
+		{
+			if( Window_FF_Livingroom_Terrace.state == CLOSED && Shutters.members.filter(s | s.state == UP).size > 0 )
+			{
+				logInfo("Rollershutter","can down")
+				sendCommand(Shutters,DOWN)
+			}
+		}
+		else
+		{
+			if( Shutters.members.filter(s | s.state == DOWN).size > 0 )
+			{
+				logInfo("Rollershutter","can up")
+				sendCommand(Shutters,UP)
+			}
+		}
+	}
+end

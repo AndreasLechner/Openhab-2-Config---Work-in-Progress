@@ -1,0 +1,42 @@
+/* File: 			home.items
+ * Autor: 			Andreas Lechner
+ * Company: 		IT Lechner
+ * Date:			31-10-2017
+ * Info:			http://www.lechnerandreas.com
+ * Description: 	DE:		In dieser Datei werden die Standard Home Items definiert 
+ * 					EN:		This file contains the standard home items definitions
+ */
+
+/* HOME GROUP ITEM DEFINITION */
+
+
+// Group Definitions
+Group gAlle 						"Alle Gruppeninformationen "					<info> 			(gGeschichte, gDiagramm, gAktuell)
+Group gInfo							"Alle Informationen"							<info>			(gAlle)
+Group gSicherheit					"Alle Sicherheitsrelevanten Informationen"		<info>			(gAlle)
+Group gNews							"Alle Neuigkeiten"								<info>			(gAlle)
+
+// Haus Gruppen
+Group gHome							"Mein Grundstück"								<home>			(gAlle)							
+Group gHaus							"Gruppe Haus"									<house>			(gHome)
+Group gKeller						"Untergeschoss / Keller"						<cellar>		(gHaus, gHome)
+Group gEG							"Erdgeschoss"									<groundfloor>	(gHaus, gHome)
+Group gOG							"Obergeschoss"									<firstfloor>	(gHaus, gHome)
+Group gDach							"Dachgeschoss"									<attic>			(gHaus, gHome)
+Group gGarten						"Garten"										<garden>		(gHome)
+Group gTerrasse						"Terrasse"										<terrace>		(gHome)
+Group gGarage						"Garage"										<garage>		(gHome)
+
+// Gruppe Keller
+Group gHeizraum						"Heizraum"										
+Group gWerkstatt					"Werkstatt"
+Group gWaschraum					"Waschraum"
+Group gHintereingang				"Hintereingang"
+
+// Gruppe Erdgeschoss
+Group gEingang						"Eingangsbereich"								<corridor>
+Group gFlur							"Flur"											<corridor>
+Group gGaesteWC						"Gäste WC"										<toilet>
+Group gWohnzimmer					"Wohnzimmer"									<livingrooms>
+Group gEsszimmer					"Esszimmer"										<dining>
+Group gKueche 						"Küche"											<kitchen>

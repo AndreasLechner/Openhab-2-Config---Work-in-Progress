@@ -1,0 +1,228 @@
+/* ggggggggggggggggggggggggggggggggggggggggggg   GRUPPENDEFINITIONEN   ggggggggggggggggggggggggggggggggggggggggggggggg */
+
+Group gDG														"Dachgeschoss"								<secondfloor>
+Group gOG 														"Obergeschoss"								<firstfloor>
+Group gEG 														"Erdgeschoss"								<groundfloor>
+Group gUG														"Untergeschoss"								<basement>
+Group gGA	 													"Garten"									<garden>
+
+/* Gruppe Untergeschoss*/
+Group UG_Oelraum												"Ölraum"									<boiler>	  	(gUG) 
+Group UG_Treppe													"Treppe nach oben"							<corridor>		(gUG)
+
+/* Gruppe Erdgeschoss */
+Group EG_GaesteWC 												"Gäste WC EG"								<bath> 			(gEG)
+Group EG_Flur		 											"Flur EG"									<corridor> 		(gEG)
+Group EG_Wohnzimmer						    					"Werkstatt EG"								<office> 		(gEG)
+Group EG_Heizung												"Heizung" 									<office> 		(gEG) 
+Group EG_Eingang    											"Eingansbereich"							<corridor> 		(gEG)
+Group EG_Treppe_Hoch											"Treppe nach oben"							<corridor>		(gEG)
+Group EG_Treppe_Runter											"Treppe nach unten"							<corridor>		(gEG)
+
+/* Gruppe Obergeschoss */
+Group OG_Bad 													"Badezimmer OG" 							<bath> 			(gOG)
+Group OG_Ankleide 												"Ankleide" 									<wardrobe> 		(gOG)
+Group OG_Schlafzimmer 											"Schlafzimmer" 								<bedroom> 		(gOG)
+Group OG_Kueche													"Kueche" 									<kitchen>		(gOG)
+Group OG_Esszimmer 												"Esszimmer" 								<dining> 		(gOG)
+Group OG_Flur 	    											"Flur" 										<corridor> 		(gOG)
+Group OG_Wohnzimmer												"Wohnzimmer" 								<living> 		(gOG)
+Group OG_Balkon													"Balkon"									<balcony>		(gOG)
+
+/* Gruppe Dachgeschoss*/
+Group DG_Vorne													"Dachgeschoss Vorne"						<attic>	  		(gDG) 
+Group DG_Hinten													"Dachgeschoss Hinten"						<attic>			(gDG)
+
+/* Gruppe Garten */
+Group GA_Garage													"Garage" 									<garage> 		(gGA)
+Group GA_Schuppen												"Schuppen"									<garage2>		(gGA)
+
+
+/* Lichter Gruppen Schaltung */
+Group:Switch:OR(ON, OFF) Lichter 								"Alle Lampen [%d]"							<selfLight>		(Alle)
+Group:Switch:OR(ON, OFF) Lichter_Haus 							"Innen Lampen [%d]"							<selfLight>		(Lichter)
+Group:Switch:OR(ON, OFF) Lichter_Garten		 					"Aussen Lampen [%d]" 						<selfLight>		(Lichter)
+Group:Switch:OR(ON, OFF) Lichter_UG 							"UG Lampen [%d]" 							<selfLight>		(Lichter_UG)
+Group:Switch:OR(ON, OFF) Lichter_EG 							"EG Lampen [%d]" 							<selfLight>		(Lichter_EG)
+Group:Switch:OR(ON, OFF) Lichter_OG 							"OG Lampen [%d]" 							<selfLight>		(Lichter_OG)
+Group:Switch:OR(ON, OFF) Lichter_DG 							"DG Lampen [%d]" 							<selfLight>		(Lichter_DG)
+
+/* Steckdosen Gruppen Schaltung */
+Group:Switch:OR(ON, OFF) Steckdosen 							"Steckdosen Ergeschoss"						<selfSocket>
+
+/* Rolläden Gruppenschaltung*/
+Group:Rollershutter:OR(UP, DOWN)	Rollaeden					"Alle Rollläden [%d]"						<selfRollershutter>	(Alle)
+Group:Rollershutter:OR(UP, DOWN)	Rollaeden_EG				"EG Rollläden [%d]" 						<selfRollershutter>	(Rollaeden)
+Group:Rollershutter:OR(UP, DOWN)	Rollaeden_OG				"OG Rollläden [%d]" 						<selfRollershutter>	(Rollaeden)
+
+/* Fenster Sensor Kontakt Gruppenabfrage */
+Group:Contact:OR(OPEN, CLOSED)	Sicherheit 						"Sicherheit [%d]"							<shield>		(Alle)
+Group:Contact:OR(OPEN, CLOSED)	Oeffnungskontakte				"Öffnungssensoren [%d]"						<shield>		(Alle)
+Group:Contact:OR(OPEN, CLOSED) 	Sensoren_Aussen					"Aussen Bewegungsmelder [%d]"				<selfMotion>	(Sicherheit)
+Group:Contact:OR(OPEN, CLOSED) 	Sensoren_Haus					"EG Bewegungsmelder [%d]"					<selfMotion>	(Sicherheit)
+Group:Contact:OR(OPEN, CLOSED) 	Sensoren_Tueren					"EG Türen [%d]"								<door>			(Sicherheit, Oeffnungskontakt)
+Group:Contact:OR(OPEN, CLOSED) 	Sensoren_Fenster_EG				"EG Fenster [%d]"							<contact>		(Sicherheit, Oeffnungskontakt)
+Group:Contact:OR(OPEN, CLOSED) 	Sensoren_Fenster_OG				"OG Fenster [%d]"							<contact>		(Sicherheit, Oeffnungskontakt)
+
+/* Bewegungsmelder Gruppen Schaltung */
+Group:Switch:OR(ON, OFF) 	Bewegungsmelder_Schalter	"Gartenlicht Details. [MAP(motiondetector_switch_de.map):%d]" <selfLightInfo>	(Sicherheit)
+
+/* ggggggggggggggggggggggggggggggggggggggggggg   GRUPPENDEFINITION ENDE  ggggggggggggggggggggggggggggggggggggggggggg */
+
+/* eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee   EINZELDEFINITIONEN   eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee */
+
+/* ---------------------------------------------   UNTERGESCHOSS   --------------------------------------------- */									
+/* Licht Schalter Untergeschoss */
+Switch Licht_UG_Treppe 								"Treppe UG"								<selfLight>		(UG_Treppe, Lichter_UG)				{ knx="1/0/0+<1/0/1" }
+Switch Licht_UG_Heizung 							"Heizung"								<selfLight>		(UG_Heizung, Lichter_UG)				{ knx="1/0/8+<1/0/9" }
+
+/* Dimmer Schalter Untergeschoss */
+
+/* Farbwechsler Schalter Untergeschoss */
+
+/* Steckdosen Schalter Untergeschoss */
+Switch Steckdose_Flur 								"Flur neben Telefon"					<selfSocket>	(UG_Flur, Steckdosen)					{ knx="0/1/7+<0/1/8" }
+Switch Steckdose_GaesteWC 							"WC Radio"								<selfSocket>	(UG_GaesteWC, Steckdosen)				{ knx="0/1/1+<0/1/2" }
+
+/* Rolladen Schalter Untergeschoss */
+
+/* ============================================   UNTERGESCHOSS ENDE  ======================================== */
+
+/* ---------------------------------------------   ERDGESCHOSS   --------------------------------------------- */
+/* Switch Erdgeschoss */
+Switch Licht_EG_Flur_Decke							"Flur EG Decke" 						<selfLight>		(EG_Flur, Lichter_EG)				{ knx="0/0/26+<0/0/27" }
+Switch Licht_EG_Flur_Spiegel 						"Flur EG Spiegel" 						<selfLight>		(EG_Flur, Lichter_EG)				{ knx="0/0/28+<0/0/29" }
+
+Switch Licht_EG_Kueche_Decke						"Küche Decke"							<selfLight>		(EG_Kueche, Lichter_EG)				{ knx="0/0/6+<0/0/7" }						
+Switch Licht_EG_Kueche_Cupboard 					"Küche Schrank" 						<selfLight>		(EG_Kueche, Lichter_EG)				{ knx="0/0/6+<0/0/7" }
+Switch Licht_EG_Kuecher_Bar 						"Küche Tresen" 							<selfLight>		(EG_Kueche, Lichter_EG)				{ knx="0/0/4+<0/0/5" }
+
+Switch Licht_EG_GaesteWC_Decke 						"Gäste WC Decke" 						<selfLight>		(EG_GaesteWC, Lichter_EG)				{ knx="0/0/20+<0/0/21" }
+Switch Licht_EG_GaesteWC_Spiegel					"Gäste WC Spiegel" 						<selfLight>		(EG_GaesteWC, Lichter_EG)				{ knx="0/0/22+<0/0/23" }
+
+/* Dimmer Erdgeschoss */
+Dimmer Licht_EG_Esszimmer_Esstisch 					"Wohnz. Esstisch [%d %%]"				<selfSlider>	(EG_Wohnzimmer, Lichter_EG)				{ knx="0/0/8, 0/0/9, 0/0/32+<0/0/33" }
+Dimmer Licht_EG_Wohnzimmer_Couch 					"Wohnz. Couch [%d %%]" 					<selfSlider>	(EG_Wohnzimmer, Lichter_EG)				{ knx="0/0/11, 0/0/12, 0/0/34+<0/0/35" }
+Dimmer Licht_EG_Wohnzimmer_Helligkeit_Standard		"Wohnz. Indirekt [%d %%]"   			<selfLight>		(EG_Wohnzimmer, Lichter_EG)
+
+
+/* Farbwechsler Schalter Erdgeschoss */
+Color Licht_EG_Wohnzimmer_Color_Standard			"Alle Lampen"							<colorwheel>
+Color Licht_EG_Wohnzimmer_Color_Standard1			"Lampe 1"								<colorwheel>										{ hue="1"}
+Color Licht_EG_Wohnzimmer_Color_Standard2			"Lampe 2"								<colorwheel>										{ hue="2"}
+Color Licht_Eg_Wohnzimmer_Color_Standard3			"Lampe 3"								<colorwheel>										{ hue="3"}
+
+/* Steckdosen Schalter Erdgeschoss */
+Switch Steckdose_Fernseher 							"Fernseher"								<selfSocket>	(FF_Livingroom,Sockets)				{ knx="0/1/3+<0/1/4" }
+Switch Steckdose_Livingroom 						"Wohnz. neben Stehlampe"				<selfSocket>	(FF_Livingroom,Sockets)				{ knx="0/1/5+<0/1/6" }
+
+/* Rolladen Schalter Erdgeschoss */
+Rollershutter Rolladen_EG_Wohnzimmer		   		"Wohnzimmer"							<selfRollershutter>	(FF_Livingroom, Shutters_FF)	{ knx="0/2/7, 0/2/8, +<0/2/9" }
+Rollershutter Rolladen_EG_Kueche_Strasse			"Küche"									<selfRollershutter>	(FF_Kitchen, Shutters_FF)		{ knx="0/2/1, 0/2/2, +<0/2/3" }
+Rollershutter Rolladen_EG_GaesteWC 					"Gäste WC"								<selfRollershutter>	(FF_GuestWC, Shutters_FF)		{ knx="0/2/10, 0/2/11, +<0/2/12" }
+/* ============================================   ERDGESCHOSS ENDE  ======================================== */
+
+/* ---------------------------------------------   OBERGESCHOSS   --------------------------------------------- */									
+/* Licht Schalter Obergeschoss */
+Switch Light_OG_Floor_Ceiling 						"Flur OG" 								<selfLight>		(SF_Floor, Lights_SF)				{ knx="1/0/0+<1/0/1" }
+Switch Light_OG_Bedroom_Ceiling 					"Schlafz. Decke"						<selfLight>		(SF_Bedroom, Lights_SF)				{ knx="1/0/8+<1/0/9" }
+Switch Light_OG_Bedroom_Left 						"Schlafz. Bett Fenster" 				<selfLight>		(SF_Bedroom, Lights_SF)				{ knx="1/1/4+<1/1/5" }
+Switch Light_OG_Bedroom_Right 						"Schlafz. Bett Wand" 					<selfLight>		(SF_Bedroom, Lights_SF)				{ knx="1/1/6+<1/1/7" }
+Switch Light_OG_Dressingroom_Ceiling				"Ankleide" 								<selfLight>		(SF_Dressingroom, Lights_SF)		{ knx="1/0/6+<1/0/7" }
+Switch Light_OG_Child1_Ceiling 						"Kind 1" 								<selfLight>		(SF_Child1, Lights_SF)				{ knx="1/0/10+<1/0/11" }
+Switch Light_OG_Child2_Ceiling 						"Kind 2" 								<selfLight>		(SF_Child2, Lights_SF)				{ knx="1/0/12+<1/0/13" }
+Switch Light_OG_Bathroom_Ceiling 					"Badezimmer Decke" 						<selfLight>		(SF_Bathroom, Lights_SF)			{ knx="1/0/2+<1/0/3" }
+Switch Light_OG_Bathroom_Mirror 					"Badezimmer Spiegel"					<selfLight>		(SF_Bathroom, Lights_SF)			{ knx="1/0/4+<1/0/5" }
+
+/* Dimmer Schalter Dachgeschoss */
+
+/* Farbwechsler Schalter Erdgeschoss */
+
+/* Steckdosen Schalter Obergeschoss */
+Switch Steckdose_OG_Flur 							"Flur"									<selfSocket>		(OG_Flur, Steckdosen)					{ knx="0/1/7+<0/1/8" }
+
+/* Rolladen Schalter Obergeschoss */
+Rollershutter Shutters_OG_Bedroom 					"Schlafzimmer"							<selfRollershutter>	(OG_Schlafzimmer, Rollaeden_OG)			{ knx="1/2/7, 1/2/8, +<1/2/9" }
+Rollershutter Shutters_OG_Child1 					"Kind 1"								<selfRollershutter>	(OG_Kind1, Rollaeden_OG)				{ knx="1/2/10, 1/2/11, +<1/2/12" }
+Rollershutter Shutters_OG_Child2_Side				"Kind 2 Gartenseite"					<selfRollershutter>	(OG_Kind2, Rollaeden_OG)				{ knx="1/2/13, 1/2/14, +<1/2/15" }
+Rollershutter Shutters_OG_Child2_Front 				"Kind 2 Straßenseite"					<selfRollershutter>	(OG_Kind2, Rollaeden_OG)				{ knx="1/2/13, 1/2/14, +<1/2/15" }
+Rollershutter Shutters_OG_Bathroom 					"Badezimmer"							<selfRollershutter>	(SF_Bathroom, Rollaeden_OG)				{ knx="1/2/1, 1/2/2, +<1/2/3" }
+/* ============================================   OBERGESCHOSS ENDE  ======================================== */
+
+/* ---------------------------------------------   DACHGESCHOSS   --------------------------------------------- */
+/* Licht Schalter Dachgeschoss */
+Switch Light_DG_Attic 								"Dachboden" 							<selfLight>		(DG, Lights_DG)				{ knx="1/0/14+<1/0/15" }
+
+/* Dimmer Schalter Dachgeschoss */
+
+/* Farbwechsler Schalter Dachgeschoss */
+
+/* Steckdosen Schalter Dachgeschoss */
+Switch Steckdose_DG_Vorne							"Dachboden"								<selfSocket>	(DG, Sockets)					{ knx="1/1/8+<1/1/9" }
+
+/* Rolladen Schalter Dachgeschoss */
+Rollershutter Rolladen_DG_Garten					"Dachboden Gartenseite"					<selfRollershutter>	(DG, Rolladen_DG)			{ knx="1/2/16, 1/2/17, +<1/2/18" }
+Rollershutter Rolladen_DG_Strasse					"Dachboden Straßenseite"				<selfRollershutter>	(DG, Rolladen_DG)			{ knx="1/2/16, 1/2/17, +<1/2/18" }
+/* ============================================    DACHGESCHOSS ENDE  ======================================== */
+
+/* ---------------------------------------------   GARTEN --------------------------------------------- */
+/* Licht Schalter Garten */
+Switch Licht_GA_Haustuer		 					"Haustür" 									<selfLight>			(Garten, Lichter_GA)
+Switch Licht_GA_Terrasse	 						"Terrasse" 									<selfLight>			(Garten, Lichter_GA)
+
+
+/* Farbwechsler Schalter Garten */
+
+/* Steckdosen Schalter Garten*/
+Switch Steckdose_GA_Strasse							"Garten Hinten"								<selfSocket>		(Garten, Steckdose_GA)						{ knx="2/1/0+<2/1/1" }
+Switch Steckdose_GA_Terrasse						"Garten Terrasse"							<selfSocket>		(Garten, Steckdose_GA)						{ knx="2/1/0+<2/1/1" }
+Switch Steckdoes_GA_Parkplatz						"Parkplatz vorne"							<selfSocket>		(Garten, Steckdose_GA)						{ knx="2/1/2+<2/1/3" }
+
+/* ============================================   GARTEN ENDE  ======================================== */
+
+/* eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee   EINZELDEFINITION ENDE  eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee */
+
+/* sssssssssssssssssssssssssssssssssssssssssss   SECURITY DEFINITIONEN  sssssssssssssssssssssssssssssssssssssssssss  */
+
+/* Türklingel */
+Contact 	Bell 																															{ knx="<0/4/7" }
+DateTime	Bell_Last_Change								"Klingel [%1$tH:%1$tM:%1$tS, %1$td.%1$tm]"		<selfBell> 			(Sicherheit)
+
+/* Zeitabfrage für die Änderung der letzten Sicherheit */
+DateTime Sicherheit_letzte_Aenderung						"Sicherheit [%1$tH:%1$tM:%1$tS, %1$td.%1$tm]"	<selfCalendar>		(Sicherheit)
+
+/* Schalter für vordefinierte Einstellungen */
+Switch Bewegungsmelder_GA 									"Gartenlicht autom."							<selfLightMotion>	(Sicherheit)							{ knx="<2/0/30" }
+
+
+/* Schalter für vordefinierte Statusbenachrichtigungen */
+Switch Status_Benachrichtigung								"Benachrichtigen"								<selfShield> 		(Sicherheit) 							{ knx="<0/4/1" }
+Switch Status_Urlaub										"Urlaubsmodus" 									<selfShield> 		(Sicherheit) 							{ knx="<0/4/8" }
+
+/* --------------------------------------------   SENSOR ABFRAGEN ERDGESCHOSS  -------------------------------------------- */
+/* Motiondetektoren Erdgeschoss */
+Contact Bewegungsmelder_EG_Flur								"Flur [MAP(motion_de.map):%s]" 			<selfMotion>	(EG_Flur, Bewegungsmelder_Haus)			{ knx="<0/4/3" }
+
+/* --------------------------------------------   SENSOR ABFRAGEN ERDGESCHOSS  -------------------------------------------- */
+/* Motiondetektoren Obergeschoss */
+Contact Bewegungsmelder_OG_Flur								"Wohnzimmer [MAP(motion_de.map):%s]"	<selfMotion>	(EG_Wohnzimmer, Bewegungsmelder_Haus)		{ knx="<0/4/2" }
+
+/* --------------------------------------------   SENSOR ABFRAGEN GARTEN  -------------------------------------------- */
+
+/* Motiondetektoren Garten */
+Contact Bewegungsmelder_GA_Terrace1							"Terasse 1 [MAP(motion_de.map):%s]"			<selfMotion> 	(Garten, Bewegungsmelder_GA)			{ knx="<2/0/14" }
+Contact Bewegungsmelder_GA_Terrace2							"Terasse 2 [MAP(motion_de.map):%s]"			<selfMotion> 	(Garten, Bewegungsmelder_GA)			{ knx="<2/0/15" }
+Contact Bewegungsmelder_GA_Frontdoor 						"Haustür [MAP(motion_de.map):%s]"			<selfMotion> 	(Garten, Bewegungsmelder_GA)			{ knx="<2/0/5" }
+Contact Bewegungsmelder_GA_Carport 							"Carport [MAP(motion_de.map):%s]"			<selfMotion> 	(Garten, Bewegungsmelder_GA)			{ knx="<2/0/8" }
+Contact Bewegungsmelder_GA_Garage_Front 					"Schuppen (vorne) [MAP(motion_de.map):%s]"	<selfMotion> 	(Garten, Bewegungsmelder_GA)			{ knx="<2/0/2" }
+Contact Bewegungsmelder_GA_Garage_Back	 					"Schuppen (hinten) [MAP(motion_de.map):%s]"	<selfMotion> 	(Garten, Bewegungsmelder_GA)			{ knx="<2/0/11" }
+
+/*  sssssssssssssssssssssssssssssssssssssssssss   SECURITY DEFINITIONEN ENDE   sssssssssssssssssssssssssssssssssssssssssss   */
+
+
+
+
+
+
+
+

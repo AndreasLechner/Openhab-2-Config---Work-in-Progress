@@ -1,0 +1,235 @@
+import org.openhab.core.library.types.*
+import org.openhab.core.persistence.*
+import org.openhab.model.script.actions.*
+import java.lang.Math
+
+// "true" to skip startup value change of "Ventilation_Fan_Level"
+var boolean autoChangeInProgress = false
+
+rule "Filterruntime"
+when
+	Item Ventilation_Filter_Runtime changed
+then
+	var Number laufzeit = Ventilation_Filter_Runtime.state as DecimalType
+
+	var Number weeks = Math::floor( (laufzeit/168).doubleValue )
+	var Number days = Math::floor( ((laufzeit-(weeks*168))/24).doubleValue)
+
+	var String msg = ""
+
+	if( weeks > 0 )
+	{
+		if( weeks == 1 ) msg = weeks.intValue + " Woche"
+		else msg = weeks.intValue + " Wochen"
+	}
+
+	if( days > 0 )
+	{
+		if( msg.length > 0 ) msg = msg + ", "
+
+		if( days == 1 ) msg = msg + days.intValue + " Tag"
+		else msg = msg + days.intValue + " Tage"
+	}
+
+	if( Ventilation_Filter_Runtime_Message.state != msg )
+	{
+		postUpdate(Ventilation_Filter_Runtime_Message,msg)
+	}
+end
+
+rule "Filter State Message"
+when
+	Item Ventilation_Error_Message changed
+	or
+	Item Ventilation_Filter_Error_I changed
+	or
+	Item Ventilation_Filter_Error_E changed
+then
+	if( Ventilation_Error_Message.state != Uninitialized && Ventilation_Filter_Error_I.state != Uninitialized && Ventilation_Filter_Error_E.state != Uninitialized )
+	{
+		var String msg = ""
+	
+		if( Ventilation_Filter_Error_I.state == 1 || Ventilation_Filter_Error_E.state == 1 )
+		{
+			if( msg.length > 0 ) msg = msg + ", "
+			msg = msg + "Filter: "
+			if( Ventilation_Filter_Error_I.state == 1 ) msg = msg + "I"
+			if( Ventilation_Filter_Error_I.state == 1 && Ventilation_Filter_Error_E.state == 1) msg = msg + " & "
+			if( Ventilation_Filter_Error_E.state == 1 ) msg = msg + "E"
+		}
+
+		if( Ventilation_Error_Message.state != "Ok" )
+		{
+			if( msg.length > 0 ) msg = msg + ", "
+			msg = msg + "Error: " + Ventilation_Error_Message.state
+		}
+	
+		if( msg.length == 0 )
+		{
+			msg = "Alles in Ordnung"
+		}
+
+		if(Ventilation_State_Message.state != msg)
+		{
+			postUpdate(Ventilation_State_Message,msg)
+		}
+	}
+end
+
+rule "Filter Outdoor Temperature Message"
+when
+	Item Ventilation_Outdoor_Incoming_Temperature changed
+	or
+	Item Ventilation_Outdoor_Outgoing_Temperature changed
+then
+	if( Ventilation_Outdoor_Incoming_Temperature.state != Uninitialized && Ventilation_Outdoor_Outgoing_Temperature.state != Uninitialized )
+	{
+		var String msg = "→ " + Ventilation_Outdoor_Incoming_Temperature.state.format("%.1f") +"°C, ← " + Ventilation_Outdoor_Outgoing_Temperature.state.format("%.1f") + "°C"
+		if( Ventilation_Outdoor_Temperature_Message.state != msg )
+		{
+			postUpdate(Ventilation_Outdoor_Temperature_Message,msg)
+		}
+	}
+end
+
+rule "Filter Indoor Temperature Message"
+when
+	Item Ventilation_Indoor_Incoming_Temperature changed
+	or
+	Item Ventilation_Indoor_Outgoing_Temperature changed
+then
+	if( Ventilation_Indoor_Incoming_Temperature.state != Uninitialized && Ventilation_Indoor_Outgoing_Temperature.state != Uninitialized )
+	{
+		var String msg = "→ " + Ventilation_Indoor_Incoming_Temperature.state.format("%.1f") +"°C, ← " + Ventilation_Indoor_Outgoing_Temperature.state.format("%.1f") + "°C"
+		if( Ventilation_Indoor_Temperature_Message.state != msg )
+		{
+			postUpdate(Ventilation_Indoor_Temperature_Message,msg)
+		}
+	}
+end
+
+rule "Filter Ventilation Message"
+when
+	Item Ventilation_Incoming changed
+	or
+	Item Ventilation_Outgoing changed
+then
+	if( Ventilation_Incoming.state != Uninitialized && Ventilation_Outgoing.state != Uninitialized )
+	{
+		var String msg = "→ " + Ventilation_Incoming.state +"%, ← " + Ventilation_Outgoing.state + "%"
+		if( Ventilation_Fan_Message.state != msg )
+		{
+			postUpdate(Ventilation_Fan_Message,msg)
+		}
+	}
+end
+
+rule "Filter Manual Action"
+when
+	Item Ventilation_Fan_Level changed
+then
+	if( autoChangeInProgress )
+	{
+		//logInfo("switch","1")
+		autoChangeInProgress = false
+	}
+	else if( previousState == Uninitialized )
+	{
+		postUpdate(Ventilation_Auto_Mode,1)
+	}
+	else
+	{
+		//logInfo("switch","2")
+		postUpdate(Ventilation_Auto_Mode,0)
+	}
+end
+
+rule "Filter Fan Level"
+when
+    Item Ventilation_Auto_Mode changed
+    or
+    Time cron "0 */1 * * * ?"
+then
+	//logInfo("switch","" + Ventilation_Auto_Mode.state)
+	//logInfo("switch","" + Ventilation_Fan_Level.state)
+	//logInfo("switch","" + Ventilation_Indoor_Outgoing_Temperature.state)
+	//logInfo("switch","" + Ventilation_Comfort_Temperature.state)
+	//logInfo("switch","" + Window_SF_Bedroom.state)
+	//logInfo("switch","" + Window_SF_Dressingroom.state)
+
+	if( 
+	    Ventilation_Auto_Mode.state != Uninitialized && Ventilation_Fan_Level.state != Uninitialized
+	    &&
+	    Ventilation_Indoor_Outgoing_Temperature.state != Uninitialized && Ventilation_Outdoor_Incoming_Temperature.state != Uninitialized && Ventilation_Comfort_Temperature.state != Uninitialized
+	    &&
+	    Window_SF_Bedroom.state != Uninitialized && Window_SF_Dressingroom.state != Uninitialized
+	)
+	{
+		if( Ventilation_Auto_Mode.state == 1 )
+		{
+			var Number day    = now.getDayOfWeek
+			var Number hour   = now.getHourOfDay
+			var Number minute = now.getMinuteOfHour
+
+			var Number currentLevel = Ventilation_Fan_Level.state as DecimalType
+			var Number newLevel = 3
+			
+			var Number waitBeforeChange = 1
+			
+			//logInfo("switch","" + State_Sleeping.state)
+
+			if( State_Sleeping.state == OFF )
+			{
+				var Number raumTemperatur = Ventilation_Indoor_Outgoing_Temperature.state as DecimalType
+				var Number aussenTemperatur = Ventilation_Outdoor_Incoming_Temperature.state as DecimalType
+				var Number zielTemperatur = Ventilation_Comfort_Temperature.state as DecimalType
+				
+				var boolean skipPresenceCheck = false;
+				
+				// Raumtemperatur ist zu warm
+				if( raumTemperatur >= zielTemperatur )
+				{
+					// aussentemperatur ist zu warm
+					if( aussenTemperatur >= raumTemperatur )
+					{
+						newLevel = 1
+						skipPresenceCheck = true;
+					}
+					// Raumtemperatur ist viel zu warm und kann mit Aussenluft gekühlt werden
+					// Lüftung sollte also nicht in den Sparmodus geschickt werden auch wenn man abwesend ist
+					else if( raumTemperatur >= zielTemperatur + 1 && aussenTemperatur < raumTemperatur )
+					{
+						skipPresenceCheck = true;
+					}
+				}
+				
+				//logInfo("test","" + newLevel)
+				
+				// Wenn der aktuelle Level Stufe 'A' (also 1) ist, sollte vor einem erneuten umschalten gewartet werden damit ein 
+				// hin und herschalten vermieden wird. z.B. bei kurzzeitigen Temperaturschwankungen
+				if( currentLevel == 1 ) waitBeforeChange = 15
+				
+				//logInfo("test","" + newLevel)
+
+				if( !skipPresenceCheck && State_Away.state == ON && !State_Away.changedSince(now.minusMinutes(60)) )
+				{
+					newLevel = 2
+				}
+				//logInfo("test","" + newLevel)
+			}
+			else
+			{
+				newLevel = 2
+			}
+
+			if( newLevel != currentLevel )
+			{
+				if( !Ventilation_Fan_Level.changedSince(now.minusMinutes(waitBeforeChange.intValue)) )
+				{
+					autoChangeInProgress=true
+					sendCommand(Ventilation_Fan_Level,newLevel)
+				}
+			}
+		}
+	}
+end

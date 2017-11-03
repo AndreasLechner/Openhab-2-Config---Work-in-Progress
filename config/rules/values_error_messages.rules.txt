@@ -1,0 +1,104 @@
+import org.openhab.core.library.types.*
+import org.openhab.core.persistence.*
+import org.openhab.model.script.actions.*
+
+rule "Check Roommessages"
+when
+	Time cron "0 */5 * * * ?"
+	or
+	Item Sensor_Doors_FF changed
+	or
+	Item Sensor_Window_FF changed
+	or
+	Item Sensor_Window_SF changed
+then
+	var String msg = ""
+	var int doorCount = Sensor_Doors_FF.members.filter(s | s.state == OPEN).size
+	
+	if( doorCount > 0 )
+	{
+		if( doorCount == 1 ) msg = "1 Tür"
+		else msg = doorCount + " Türen"
+	}
+	
+	var int windowCount = Sensor_Window_FF.members.filter(s | s.state == OPEN).size + Sensor_Window_SF.members.filter(s | s.state == OPEN).size
+
+	if( windowCount > 0 )
+	{
+		if( msg.length > 0 ) msg = msg + " und "
+		msg = msg + windowCount + " Fenster"
+	}
+
+	if( msg.length > 0 ) msg = msg + " offen"
+	else msg = "Alles geschlossen"
+	
+	if( RoomStatus.state != msg )
+	{
+		postUpdate(RoomStatus,msg)
+	}
+end
+
+rule "Check Errormessages"
+when
+	Time cron "0 */5 * * * ?"
+	or
+	Item Ventilation_Filter_Error_I changed
+	or
+	Item Ventilation_Filter_Error_E changed
+	or
+	Item Ventilation_Error_Message changed
+	or
+	Item Heating_Common_Fault changed
+then
+	var String type = "Fehler"
+	var String priority = "1"
+	var String msg = ""
+
+	if( Ventilation_Filter_Error_I.state > 0
+	    || Ventilation_Filter_Error_E.state > 0
+	    || Ventilation_Error_Message.state != "Ok"
+	)
+	{
+		if( msg.length > 0 ) msg = msg + ", "
+		msg = msg + "Lüftung"
+	}
+    
+	if( Heating_Common_Fault.state > 0 )
+	{
+	    if( msg.length > 0 ) msg = msg + ", "
+	    msg = msg + "Heizung"
+	}
+	
+	if( CPUTemp.state > 60
+	    || SystemTemp.state > 60
+	    || FanSpeed.state < 1000
+	    || Mountpoint0_Percent.state > 70
+	    || Mountpoint1_Percent.state > 60
+	    || Mountpoint2_Percent.state > 60
+	    || HardDisk0_Temp.state > 45
+	    || HardDisk0_Status.state != "ok"
+	    || HardDisk1_Temp.state > 40
+	    || HardDisk1_Status.state != "ok"
+	    || HardDisk2_Temp.state > 45
+	    || HardDisk2_Status.state != "ok"
+	    || MemoryUsage_Percent.state > 50
+	    || LoadAvg_15min.state > 0.5
+	)
+	{
+        if( msg.length > 0 ) msg = msg + ", "
+	    msg = msg + "Hardware"
+	}
+	
+	if( msg.length == 0 )
+	{
+	    msg = "Alles in Ordnung"
+	    type = "Info"
+	    priority = "0"
+	}
+	
+	if( MainStatus.state != msg )
+	{
+		pushover(type+": "+msg)
+		postUpdate(MainStatus,msg)
+	}
+end

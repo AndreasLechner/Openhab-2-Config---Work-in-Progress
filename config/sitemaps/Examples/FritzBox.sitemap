@@ -1,0 +1,8 @@
+sitemap FritzBox label="Fritz"	{	
+	
+		Frame label= "Fritz Box Anruferdaten" { 
+ 		
+ 				Group item=gFritz label="Fritz!Box"
+ 		
+ 		}
+}

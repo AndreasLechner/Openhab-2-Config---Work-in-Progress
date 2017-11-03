@@ -1,0 +1,15 @@
+
+/* File: 			YahooWeather.things
+ * Autor: 			Andreas Lechner
+ * Company: 		IT Lechner
+ * Date:			26-10-2017
+ * Info:			http://www.lechnerandreas.com
+ * Description: 	DE:		In dieser Datei werden die Things für YahooWeather definiert 
+ * 					EN:		This file contains things definitions for YahooWeather
+ */
+
+// Yahoo Wetter Thing Definition Aschaffenburg
+yahooweather:weather:Aschaffenburg [ location=12596953 ]
+
+// Yahoo Wetter Thing Definition Landkreis Aschaffenburg
+yahooweather:weather:LdkAburg [ location=635617 ]

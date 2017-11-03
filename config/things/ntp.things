@@ -1,0 +1,4 @@
+ntp:ntp:local  	[ hostname="0.pool.ntp.org", refreshInterval=60, refreshNtp=30 ,locale="", timeZone="Europe/Berlin" ]
+ntp:ntp:berlin  [ hostname="0.pool.ntp.org", refreshInterval=60, refreshNtp=30 ,locale="", timeZone="Europe/Berlin" ]
+ntp:ntp:london  [ hostname="0.pool.ntp.org", refreshInterval=60, refreshNtp=30 ,locale="", timeZone="Europe/London" ]
+ntp:ntp:newyork [ hostname="0.pool.ntp.org", refreshInterval=60, refreshNtp=30 ,locale="", timeZone="America/NewYork" ]

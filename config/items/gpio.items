@@ -1,0 +1,1 @@
+Switch NormallyClosedRelay "Normally Closed Relay" { gpio="pin:17 activelow:yes initialValue:high" }

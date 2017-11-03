@@ -1,0 +1,51 @@
+import org.openhab.core.library.types.*
+import org.openhab.core.persistence.*
+import org.openhab.model.script.actions.*
+import java.lang.Math
+
+rule "Christmas lamps on"
+when
+	Time cron "0 0 16 * * ?"
+	or
+	Item State_Sleeping changed from ON to OFF
+then
+	if( Auto_Christmas.state == ON && ( Socket_Livingroom.state == OFF || Socket_Floor.state == OFF ) )
+	{
+		var Number hour   = now.getHourOfDay
+		var Number minute = now.getMinuteOfHour
+
+		if( ( hour == 16 && minute == 0 ) || ( hour < 10 && State_Sleeping.state == OFF && State_Away.state == OFF ) )
+		{
+			sendCommand(Socket_Livingroom,ON)
+			sendCommand(Socket_Floor,ON)
+		}
+	}
+end
+
+rule "Christmas lamps off"
+when
+	Time cron "0 0 22 * * ?"
+	or
+	Item State_Away changed from OFF to ON
+	or
+	Item State_Sleeping changed from OFF to ON
+then
+	//logInfo("christmas1",""+Socket_Livingroom.state)
+	//logInfo("christmas2",""+Socket_Floor.state)
+	
+	if( Auto_Christmas.state == ON && ( Socket_Livingroom.state == ON || Socket_Floor.state == ON ) )
+	{
+		var Number hour   = now.getHourOfDay
+		var Number minute = now.getMinuteOfHour
+		
+		//logInfo("christmas3",""+hour)
+		//logInfo("christmas4",""+State_Away.state)
+		//logInfo("christmas5",""+State_Sleeping.state)
+	
+		if( ( State_Away.state == ON && ( ( hour > 3 && hour < 10 ) || ( hour == 22 && minute == 0 ) ) ) || State_Sleeping.state == ON ) 
+		{
+			sendCommand(Socket_Livingroom,OFF)
+			sendCommand(Socket_Floor,OFF)
+		}
+	}
+end

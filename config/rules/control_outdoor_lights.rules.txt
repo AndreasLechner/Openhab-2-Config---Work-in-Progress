@@ -1,0 +1,454 @@
+import org.openhab.core.library.types.*
+import org.openhab.core.persistence.*
+import org.openhab.model.script.actions.*
+import java.lang.Math
+
+// Constants
+var Number K = 0.017453
+
+// Change this reflecting your destination
+var Number latitude = 52.347767
+var Number longitude = 13.621287
+
+var Integer timerDuration = 60
+var Timer timerHaustuer
+var Number changeInProgressHaustuer = 0
+var Timer timerCarport
+var Number changeInProgressCarport = 0
+var Timer timerTerasse
+var Number changeInProgressTerasse = 0
+var Timer timerSchuppen_vorne
+var Number changeInProgressSchuppen_vorne = 0
+var Timer timerSchuppen_hinten
+var Number changeInProgressSchuppen_hinten = 0
+
+var Boolean changeInProgressAussen_Switch = false
+var Number changeInProgressDetail_Switch = 0
+
+rule "Motiondetector_Outdoor_Switch"
+when
+	Item Motiondetector_Outdoor_Switch changed
+then
+	if( changeInProgressAussen_Switch )
+	{
+		changeInProgressAussen_Switch = false
+	}
+	else
+	{
+		if( Motiondetector_Outdoor_Garage_Streetside_Switch.state != Motiondetector_Outdoor_Switch.state)
+		{
+			changeInProgressDetail_Switch = changeInProgressDetail_Switch + 1
+			postUpdate(Motiondetector_Outdoor_Garage_Streetside_Switch,Motiondetector_Outdoor_Switch.state)
+		}
+		if( Motiondetector_Outdoor_Frontdoor_Switch.state != Motiondetector_Outdoor_Switch.state)
+		{
+			changeInProgressDetail_Switch = changeInProgressDetail_Switch + 1
+			postUpdate(Motiondetector_Outdoor_Frontdoor_Switch,Motiondetector_Outdoor_Switch.state)
+		}
+		if( Motiondetector_Outdoor_Carport_Switch.state != Motiondetector_Outdoor_Switch.state)
+		{
+			changeInProgressDetail_Switch = changeInProgressDetail_Switch + 1
+			postUpdate(Motiondetector_Outdoor_Carport_Switch,Motiondetector_Outdoor_Switch.state)
+		}
+		if( Motiondetector_Outdoor_Terrace_Switch.state != Motiondetector_Outdoor_Switch.state)
+		{
+			changeInProgressDetail_Switch = changeInProgressDetail_Switch + 1
+			postUpdate(Motiondetector_Outdoor_Terrace_Switch,Motiondetector_Outdoor_Switch.state)
+		}
+		if( Motiondetector_Outdoor_Garage_Gardenside_Switch.state != Motiondetector_Outdoor_Switch.state)
+		{
+			changeInProgressDetail_Switch = changeInProgressDetail_Switch + 1
+			postUpdate(Motiondetector_Outdoor_Garage_Gardenside_Switch,Motiondetector_Outdoor_Switch.state)
+		}
+	}
+end
+
+rule "Motiondetector_Outdoor_Detail_Switch"
+when
+	Item Motiondetector_Outdoor_Garage_Streetside_Switch changed
+	or
+	Item Motiondetector_Outdoor_Frontdoor_Switch changed
+	or
+	Item Motiondetector_Outdoor_Carport_Switch changed
+	or
+	Item Motiondetector_Outdoor_Terrace_Switch changed
+	or
+	Item Motiondetector_Outdoor_Garage_Gardenside_Switch changed
+then
+	if( changeInProgressDetail_Switch > 0 )
+	{
+		changeInProgressDetail_Switch = changeInProgressDetail_Switch - 1
+	}
+	else{
+
+		if(
+			Motiondetector_Outdoor_Garage_Streetside_Switch.state == OFF
+			||
+			Motiondetector_Outdoor_Frontdoor_Switch.state == OFF
+			||
+			Motiondetector_Outdoor_Carport_Switch.state == OFF
+			||
+			Motiondetector_Outdoor_Terrace_Switch.state == OFF
+			||
+			Motiondetector_Outdoor_Garage_Gardenside_Switch.state == OFF
+		)
+		{
+			if( Motiondetector_Outdoor_Switch.state != OFF )
+			{
+				changeInProgressAussen_Switch = true
+				sendCommand(Motiondetector_Outdoor_Switch,OFF)
+			}
+		}
+		else
+		{
+			if( Motiondetector_Outdoor_Switch.state != ON )
+			{
+				changeInProgressAussen_Switch = true
+				sendCommand(Motiondetector_Outdoor_Switch,ON)
+			}
+		}
+	}
+end
+
+rule "Front door light"
+when
+	Item Light_Outdoor_Frontdoor changed
+then
+
+	if( changeInProgressHaustuer > 0 )
+	{
+		changeInProgressHaustuer = changeInProgressHaustuer - 1
+	}
+	else
+	{
+		postUpdate(Light_Outdoor_Frontdoor_Manual,Light_Outdoor_Frontdoor.state as OnOffType)
+	}
+end
+
+rule "Front door manual"
+when
+	Item Light_Outdoor_Frontdoor_Manual changed
+then
+	if(timerHaustuer!=null) 
+	{
+		timerHaustuer.cancel
+		timerHaustuer = null
+	}
+	if( Light_Outdoor_Frontdoor.state != Light_Outdoor_Frontdoor_Manual.state )
+	{
+		changeInProgressHaustuer = changeInProgressHaustuer + 1
+		sendCommand(Light_Outdoor_Frontdoor,Light_Outdoor_Frontdoor_Manual.state as OnOffType)
+	}
+end
+
+rule "Front door motion detector"
+when
+	Item Motiondetector_Outdoor_Frontdoor changed
+then
+	if( State_Outdoorlights.state == ON && Motiondetector_Outdoor_Frontdoor_Switch.state == ON && Light_Outdoor_Frontdoor_Manual.state != ON && Motiondetector_Outdoor_Frontdoor.state == OPEN )
+	{
+		if(timerHaustuer!=null) 
+		{
+			timerHaustuer.cancel
+			timerHaustuer = null
+		}
+		if(Light_Outdoor_Frontdoor.state!=ON)
+		{
+			changeInProgressHaustuer = changeInProgressHaustuer + 1
+			sendCommand(Light_Outdoor_Frontdoor,ON)
+		}
+		timerHaustuer = createTimer(now.plusSeconds(timerDuration)) [|
+			if(Light_Outdoor_Frontdoor_Manual.state != ON)
+			{
+				if(Motiondetector_Outdoor_Frontdoor.state == OPEN)
+				{
+					timerHaustuer.reschedule(now.plusSeconds(timerDuration))
+				}
+				else
+				{
+					if(Light_Outdoor_Frontdoor.state!=OFF)
+					{
+						changeInProgressHaustuer = changeInProgressHaustuer + 1
+						sendCommand(Light_Outdoor_Frontdoor,OFF)
+					}
+					timerHaustuer = null
+				}
+			}
+		]
+	}
+end
+ 
+rule "Carpot light"
+when
+	Item Light_Outdoor_Carport changed
+then
+
+	if( changeInProgressCarport > 0 )
+	{
+		changeInProgressCarport = changeInProgressCarport - 1
+	}
+	else
+	{
+		postUpdate(Light_Outdoor_Carport_Manual,Light_Outdoor_Carport.state as OnOffType)
+	}
+end
+
+rule "Carport manual"
+when
+	Item Light_Outdoor_Carport_Manual changed
+then
+	if(timerCarport!=null)
+	{
+		timerCarport.cancel
+		timerCarport = null
+	}
+	if( Light_Outdoor_Carport.state != Light_Outdoor_Carport_Manual.state )
+	{
+		changeInProgressCarport = changeInProgressCarport + 1
+		sendCommand(Light_Outdoor_Carport,Light_Outdoor_Carport_Manual.state as OnOffType)
+	}
+end
+
+rule "Carport motion detector"
+when
+	Item Motiondetector_Outdoor_Carport changed
+then
+	if( State_Outdoorlights.state == ON && Motiondetector_Outdoor_Carport_Switch.state == ON && Light_Outdoor_Carport_Manual.state != ON && Motiondetector_Outdoor_Carport.state == OPEN )
+	{
+		if(timerCarport!=null)
+		{
+			timerCarport.cancel
+			timerCarport = null
+		}
+		if(Light_Outdoor_Carport.state!=ON)
+		{
+			changeInProgressCarport = changeInProgressCarport + 1
+			sendCommand(Light_Outdoor_Carport,ON)
+		}
+		timerCarport = createTimer(now.plusSeconds(timerDuration)) [|
+			if(Light_Outdoor_Carport_Manual.state != ON)
+			{
+				if(Motiondetector_Outdoor_Carport.state == OPEN)
+				{
+					timerCarport.reschedule(now.plusSeconds(timerDuration))
+				}
+				else
+				{
+					if(Light_Outdoor_Carport.state!=OFF)
+					{
+						changeInProgressCarport = changeInProgressCarport + 1
+						sendCommand(Light_Outdoor_Carport,OFF)
+					}
+					timerCarport = null
+				}
+			}
+		]
+	}
+end
+
+rule "Terrace light"
+when
+	Item Light_Outdoor_Terrace changed
+then
+	if( changeInProgressTerasse > 0 )
+	{
+		changeInProgressTerasse = changeInProgressTerasse - 1
+	}
+	else if(Light_Outdoor_Terrace_Manual.state!=Light_Outdoor_Terrace.state)
+	{
+		postUpdate(Light_Outdoor_Terrace_Manual,Light_Outdoor_Terrace.state)
+	}
+end
+
+rule "Terrace manual"
+when
+	Item Light_Outdoor_Terrace_Manual changed
+then
+	if(timerTerasse!=null) 
+	{
+		timerTerasse.cancel
+		timerTerasse = null
+	}
+	if(Light_Outdoor_Terrace.state!=Light_Outdoor_Terrace_Manual.state)
+	{
+		if(Light_Outdoor_Terrace.state==0) changeInProgressTerasse = changeInProgressTerasse + 1
+		changeInProgressTerasse = changeInProgressTerasse + 1
+		sendCommand(Light_Outdoor_Terrace,Light_Outdoor_Terrace_Manual.state)
+	}
+end
+
+rule "terrace motion detector"
+when
+	Item Motiondetector_Outdoor_Terrace1 changed
+	or
+	Item Motiondetector_Outdoor_Terrace2 changed
+then
+	if( State_Outdoorlights.state == ON && Motiondetector_Outdoor_Terrace_Switch.state == ON && (!(Light_Outdoor_Terrace_Manual.state instanceof DecimalType) || Light_Outdoor_Terrace_Manual.state == 0) && (Motiondetector_Outdoor_Terrace1.state == OPEN || Motiondetector_Outdoor_Terrace2.state == OPEN))
+	{
+		if(timerTerasse!=null)
+		{
+			timerTerasse.cancel
+			timerTerasse = null
+		}
+		if(Light_Outdoor_Terrace.state!=ON)
+		{
+			changeInProgressTerasse = changeInProgressTerasse + 1
+			sendCommand(Light_Outdoor_Terrace,ON)
+		}
+		timerTerasse = createTimer(now.plusSeconds(timerDuration)) [|
+		
+			if(!(Light_Outdoor_Terrace_Manual.state instanceof DecimalType) || Light_Outdoor_Terrace_Manual.state == 0)
+			{
+				if(Motiondetector_Outdoor_Terrace1.state == OPEN || Motiondetector_Outdoor_Terrace2.state == OPEN)
+				{
+					timerTerasse.reschedule(now.plusSeconds(timerDuration))
+				}
+				else
+				{
+					if(Light_Outdoor_Terrace.state!=OFF)
+					{
+						changeInProgressTerasse = changeInProgressTerasse + 1
+						sendCommand(Light_Outdoor_Terrace,OFF)
+					}
+					timerTerasse = null
+				}
+			}
+		]
+	}
+end
+
+rule "Garage streetside light"
+when
+	Item Light_Outdoor_Garage_Streedside changed
+then
+
+	if( changeInProgressSchuppen_vorne > 0 )
+	{
+		changeInProgressSchuppen_vorne = changeInProgressSchuppen_vorne - 1
+	}
+	else
+	{
+		postUpdate(Light_Outdoor_Garage_Streedside_Manual,Light_Outdoor_Garage_Streedside.state as OnOffType)
+	}
+end
+
+rule "Garage streetside manual"
+when
+	Item Light_Outdoor_Garage_Streedside_Manual changed
+then
+	if(timerSchuppen_vorne!=null) 
+	{
+		timerSchuppen_vorne.cancel
+		timerSchuppen_vorne = null
+	}
+	if( Light_Outdoor_Garage_Streedside.state != Light_Outdoor_Garage_Streedside_Manual.state )
+	{
+		changeInProgressSchuppen_vorne = changeInProgressSchuppen_vorne + 1
+		sendCommand(Light_Outdoor_Garage_Streedside,Light_Outdoor_Garage_Streedside_Manual.state as OnOffType)
+	}
+end
+
+rule "Garage streetside motion detector"
+when
+	Item Motiondetector_Outdoor_Garage_Streetside changed
+then
+	if( State_Outdoorlights.state == ON && Motiondetector_Outdoor_Garage_Streetside_Switch.state == ON && Light_Outdoor_Garage_Streedside_Manual.state != ON && Motiondetector_Outdoor_Garage_Streetside.state == OPEN )
+	{
+		if(timerSchuppen_vorne!=null) 
+		{
+			timerSchuppen_vorne.cancel
+			timerSchuppen_vorne = null
+		}
+		if(Light_Outdoor_Garage_Streedside.state!=ON)
+		{
+			changeInProgressSchuppen_vorne = changeInProgressSchuppen_vorne + 1
+			sendCommand(Light_Outdoor_Garage_Streedside,ON)
+		}
+		timerSchuppen_vorne = createTimer(now.plusSeconds(timerDuration)) [|
+			if(Light_Outdoor_Garage_Streedside_Manual.state != ON)
+			{
+				if(Motiondetector_Outdoor_Garage_Streetside.state == OPEN)
+				{
+					timerSchuppen_vorne.reschedule(now.plusSeconds(timerDuration))
+				}
+				else
+				{
+					if(Light_Outdoor_Garage_Streedside.state!=OFF)
+					{
+						changeInProgressSchuppen_vorne = changeInProgressSchuppen_vorne + 1
+						sendCommand(Light_Outdoor_Garage_Streedside,OFF)
+					}
+					timerSchuppen_vorne = null
+				}
+			}
+		]
+	}
+end
+
+rule "Garage gardenside light"
+when
+	Item Light_Outdoor_Garage_Gardenside changed
+then
+
+	if( changeInProgressSchuppen_hinten > 0 )
+	{
+		changeInProgressSchuppen_hinten = changeInProgressSchuppen_hinten - 1
+	}
+	else
+	{
+		postUpdate(Light_Outdoor_Garage_Gardenside_Manual,Light_Outdoor_Garage_Gardenside.state as OnOffType)
+	}
+end
+
+rule "Garage gardenside manual"
+when
+	Item Light_Outdoor_Garage_Gardenside_Manual changed
+then
+	if(timerSchuppen_hinten!=null) 
+	{
+		timerSchuppen_hinten.cancel
+		timerSchuppen_hinten = null
+	}
+	if( Light_Outdoor_Garage_Gardenside.state != Light_Outdoor_Garage_Gardenside_Manual.state )
+	{
+		changeInProgressSchuppen_hinten = changeInProgressSchuppen_hinten + 1
+		sendCommand(Light_Outdoor_Garage_Gardenside,Light_Outdoor_Garage_Gardenside_Manual.state as OnOffType)
+	}
+end
+
+rule "Garage gardenside motion detector"
+when
+	Item Motiondetector_Outdoor_Garage_Gardenside changed
+then
+	if( State_Outdoorlights.state == ON && Motiondetector_Outdoor_Garage_Gardenside_Switch.state == ON && Light_Outdoor_Garage_Gardenside_Manual.state != ON && Motiondetector_Outdoor_Garage_Gardenside.state == OPEN )
+	{
+		if(timerSchuppen_hinten!=null) 
+		{
+			timerSchuppen_hinten.cancel
+			timerSchuppen_hinten = null
+		}
+		if(Light_Outdoor_Garage_Gardenside.state!=ON)
+		{
+			changeInProgressSchuppen_hinten = changeInProgressSchuppen_hinten + 1
+			sendCommand(Light_Outdoor_Garage_Gardenside,ON)
+		}
+		timerSchuppen_hinten = createTimer(now.plusSeconds(timerDuration)) [|
+			if(Light_Outdoor_Garage_Gardenside_Manual.state != ON)
+			{
+				if(Motiondetector_Outdoor_Garage_Gardenside.state == OPEN)
+				{
+					timerSchuppen_hinten.reschedule(now.plusSeconds(timerDuration))
+				}
+				else
+				{
+					if(Light_Outdoor_Garage_Gardenside.state!=OFF)
+					{
+						changeInProgressSchuppen_hinten = changeInProgressSchuppen_hinten + 1
+						sendCommand(Light_Outdoor_Garage_Gardenside,OFF)
+					}
+					timerSchuppen_hinten = null
+				}
+			}
+		]
+	}
+end

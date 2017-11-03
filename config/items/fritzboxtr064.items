@@ -1,0 +1,52 @@
+/* File: 			YahooWeather.items
+ * Autor: 			Andreas Lechner
+ * Company: 		IT Lechner
+ * Date:			26-10-2017
+ * Info:			http://www.lechnerandreas.com
+ * Description: 	DE:		In dieser Datei werden die Items für das FritzBox TR64 Binding definiert 
+ * 					EN:		This file contains items definitions for FritzBox TR64 Binding
+ */
+
+/* ITEM DEFINITION FritzBox TR64 */
+
+
+// Group Definitions
+Group 	gFritz      				"Router Info"													<network>	(gAlle)
+Group   gTelefon					"Telefon Info"													<phone>		(gAlle)
+Group 	gWifi		  				"Wifi Info"														<wifi>		(gAlle, gNetzwerk)
+Group 	gAnwesend					"Anwesenheits Info"															(gAlle)
+Group	gNetzwerk					"Netzwerk Informationen"										<network>	(gAlle)
+
+
+
+// Number Definitions
+Number  FritzNeueNachricht 			"Neue Nachrichten auf AB 0 [%s]" 								<phone>		(gFritz, gTelefon, gInfo)											{ fritzboxtr064="tamNewMessages:0" }
+Number  FritzVerpassteAnrufe 		"Anrufe in Abwesenheit in den letzten 5 Tagen [%s]" 			<phone>		(gFritz, gTelefon, gInfo)											{ fritzboxtr064="missedCallsInDays:5" }  
+
+
+// String Definitions
+String  FritzBoxName      			"Fritz!Box Model [%s]"											<network>	(gFritz, gInfo, gNetzwerk) 													{ fritzboxtr064="modelName" }
+String  FritzWanIP     				"WAN IP Adresse [%s]" 											<network>	(gFritz, gInfo, gNetzwerk) 													{ fritzboxtr064="wanip" }
+String  FritzWifi24Info    			"2,4GHz WLAN Information" 										<wifi> 		(gFritz, gWiFi, gInfo) 												{ fritzboxtr064="wifi24Switch" }
+
+// Contact Definitions
+Contact HandyTrickOnline 			"Trick Handy WLAN-Präsenz (WiFi) [MAP(fritzboxtr064.map):%d]"	<wifi>		(gFritz, gAnwesend, gInfo, gGeschichte, gAktuell, gNetzwerk)		{ fritzboxtr064="maconline:B8-53-AC-AC-87-30" }
+Contact HandyHerthaOnline 			"Hertha Handy WLAN-Präsenz (WiFi) [MAP(fritzboxtr064.map):%d]"	<wifi>		(gFritz, gAnwesend, gInfo, gGeschichte, gAktuell, gNetzwerk)		{ fritzboxtr064="maconline:58-1F-AA-33-EE-F7" }
+Contact HandyHansOnline 			"Hans Handy WLAN-Präsenz (WiFi) [MAP(fritzboxtr064.map):%d]"	<wifi>		(gFritz, gAnwesend, gInfo, gGeschichte, gAktuell, gNetzwerk)		{ fritzboxtr064="maconline:F4-0E-22-B2-00-17" }
+
+
+// Switch Definitions
+Switch  FritzKlingelnEingehend		"Telefon klingelt eingehend[%s]" 								<phone> 	(gFritz, gTelefon)										{ fritzboxtr064="callmonitor_ringing" }
+Switch  FritzKlingelnAusgehend		"Telefon klingelt ausgehend [%s]" 								<phone> 	(gFritz, gTelefon)										{ fritzboxtr064="callmonitor_outgoing" }
+Switch  FritzWifi24    				"2,4GHz WLAN (An/Aus)" 											<wifi> 		(gFritz, gWiFi, gNetzwerk) 										{ fritzboxtr064="wifi24Switch" }
+Switch  FritzWifi50    				"5,0GHz WLAN (An/Aus)" 											<wifi> 		(gFritz, gWiFi, gNetzwerk) 										{ fritzboxtr064="wifi50Switch" }
+Switch  FritzGaesteWifi 			"Gäste  WLAN (An/Aus)" 											<wifi> 		(gFritz, gWiFi, gNetzwerk) 										{ fritzboxtr064="wifiGuestSwitch" }
+Switch  FritzAnrufbeantworter		"Anrufbeantworter 0 (An/Aus)" 									<phone>		(gFritz, gTelefon)										{ fritzboxtr064="tamSwitch:0" }
+
+
+// Call Definitions
+Call    FritzEingehenderAnruf 		"Eingehender Anruf Nr: [%1$s an Nebenstelle: %2$s]" 		<phone>		(gFritz, gTelefon)										{ fritzboxtr064="callmonitor_ringing" }
+Call    FritzAusgehenderAnruf		"Ausgehender Anruf: [%1$s to %2$s]" 						<phone>		(gFritz, gTelefon)										{ fritzboxtr064="callmonitor_outgoing" }
+Call    FritzEingehenderAnrufInfo  	"Eingehender Anruf-Name: [%1$s an Nebenstelle: %2$s]" 		<phone>		(gFritz, gTelefon)										{ fritzboxtr064="callmonitor_ringing:resolveName" }
+Call    FritzAusgehenderAnrufInfo 	"Ausgehender Anruf-Name: [%2$s an Nebenstelle: %1$s]" 		<phone>		(gFritz, gTelefon)										{ fritzboxtr064="callmonitor_outgoing:resolveName" }
+

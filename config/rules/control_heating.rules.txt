@@ -1,0 +1,656 @@
+import org.openhab.core.library.types.*
+import org.openhab.core.persistence.*
+import org.openhab.model.script.actions.*
+import java.lang.Math
+
+rule "Heating_Power Message"
+when
+	Item Heating_Power changed
+	or
+	Item Heating_Circuit_Pump_Speed changed
+then
+
+	if( Heating_Power.state != Uninitialized && Heating_Circuit_Pump_Speed.state != Uninitialized )
+	{
+		var String msg = Heating_Power.state.format("%.0f") +"%, " + Heating_Circuit_Pump_Speed.state.format("%.0f") + "%"
+		if( Heating_Power_Message.state != msg )
+		{
+			postUpdate(Heating_Power_Message,msg)
+		}
+	}
+end
+
+rule "Heating_Temperature_Outdoor Message"
+when
+	Item Heating_Temperature_Outdoor changed
+	or
+	Item Heating_Temperature_Outdoor_Subdued changed
+	or
+	Item Temperature_Garden_Forecast changed
+then
+
+	if( Heating_Temperature_Outdoor.state != Uninitialized && Heating_Temperature_Outdoor_Subdued.state != Uninitialized && Temperature_Garden_Forecast.state != Uninitialized)
+	{
+		var String msg = "(" + Temperature_Garden_Forecast.state.format("%.1f") + "°C) " + Heating_Temperature_Outdoor.state.format("%.1f") +"°C, " + Heating_Temperature_Outdoor_Subdued.state.format("%.1f") + "°C"
+		if( Heating_Temperature_Outdoor_Message.state != msg )
+		{
+			postUpdate(Heating_Temperature_Outdoor_Message,msg)
+		}
+	}
+end
+
+rule "Heating_Temperature_Offset Message"
+when
+	Item Heating_Temperature_Offset changed
+	or
+	Item Heating_Temperature_Offset_Target changed
+then
+
+	if( Heating_Temperature_Offset.state != Uninitialized && Heating_Temperature_Offset_Target.state != Uninitialized )
+	{
+		var String msg = Heating_Temperature_Offset.state.format("%.1f") +"°C, " + Heating_Temperature_Offset_Target.state.format("%.1f") + "°C"
+		if( Heating_Temperature_Offset_Message.state != msg )
+		{
+			postUpdate(Heating_Temperature_Offset_Message,msg)
+		}
+	}
+end
+
+rule "Heating_Temperature_Boiler Message"
+when
+	Item Heating_Temperature_Boiler changed
+	or
+	Item Heating_Temperature_Boiler_Target changed
+then
+
+	if( Heating_Temperature_Boiler.state != Uninitialized && Heating_Temperature_Boiler_Target.state != Uninitialized )
+	{
+		var String msg = Heating_Temperature_Boiler.state.format("%.1f") +"°C, " + Heating_Temperature_Boiler_Target.state.format("%.1f") + "°C"
+		if( Heating_Temperature_Boiler_Message.state != msg )
+		{
+			postUpdate(Heating_Temperature_Boiler_Message,msg)
+		}
+	}
+end
+
+rule "Last burner starts per day"
+when
+   	Time cron "0 59 23 * * ?"
+then
+	var DecimalType start = Heating_Burner_Starts.historicState(now.toDateMidnight).state as DecimalType
+	var DecimalType aktuell = Heating_Burner_Starts.state as DecimalType
+	if( aktuell > 0 && start > 0 )
+	{
+		var DecimalType value = (aktuell - start)
+		if( Heating_Burner_Starts_Last.state != value )
+		{
+			postUpdate(Heating_Burner_Starts_Last,value)
+		}
+	}
+end
+
+rule "Burner starts"
+when
+	Time cron "15 0 0 * * ?"
+	or
+	Item Heating_Burner_Starts changed
+then
+
+	var DecimalType start = Heating_Burner_Starts.historicState(now.toDateMidnight).state as DecimalType
+	var DecimalType aktuell = Heating_Burner_Starts.state as DecimalType
+	if( start > 0 && aktuell > 0 )
+	{
+		var DecimalType differenz = new DecimalType(aktuell - start)
+		var String msg = differenz.format("%.0f") +", " + aktuell.format("%.0f")
+		if( Heating_Burner_Starts_Message.state != msg )
+		{
+			postUpdate(Heating_Burner_Starts_Message,msg)
+		}
+	}
+end
+
+rule "Last Burner Hours per day"
+when
+   	Time cron "0 59 23 * * ?"
+then
+
+	var DecimalType start = Heating_Burner_Hours.historicState(now.toDateMidnight).state as DecimalType
+	var DecimalType aktuell = Heating_Burner_Hours.state as DecimalType
+	if( start > 0 && aktuell > 0 )
+	{
+		var DecimalType value = (aktuell - start)
+		if( Heating_Burner_Hours_Last.state != value )
+		{
+			postUpdate(Heating_Burner_Hours_Last,value)
+		}
+	}
+end
+
+rule "Burner Hours"
+when
+	Time cron "15 0 0 * * ?"
+	or
+   	Item Heating_Burner_Hours changed
+then
+	
+	var DecimalType start = Heating_Burner_Hours.historicState(now.toDateMidnight).state as DecimalType
+	var DecimalType aktuell = Heating_Burner_Hours.state as DecimalType
+	if( start > 0 && aktuell > 0 )
+	{
+		var DecimalType differenz = new DecimalType( aktuell - start )
+		var String msg = differenz.format("%.0f") +" h, " + aktuell.format("%.0f")+" h"
+		if( Heating_Burner_Hours_Message.state != msg )
+		{
+			postUpdate(Heating_Burner_Hours_Message,msg)
+		}
+	}
+end
+
+rule "Heating Temperature Solar Message"
+when
+	Item Heating_Temperature_Solar_Collector changed
+	or
+	Item Heating_Temperature_Solar_Storage changed
+then
+
+	if( Heating_Temperature_Solar_Collector.state != Uninitialized && Heating_Temperature_Solar_Storage.state != Uninitialized )
+	{
+		var String msg = Heating_Temperature_Solar_Collector.state.format("%.1f") +"°C, " + Heating_Temperature_Solar_Storage.state.format("%.1f") + "°C"
+		if( Heating_Temperature_Solar_Message.state != msg )
+		{
+			postUpdate(Heating_Temperature_Solar_Message,msg)
+		}
+	}
+end
+
+rule "Heating Solar State Message"
+when
+	Item Heating_Solar_Pump_State changed
+	or
+	Item Heating_Solar_Reheating_State changed
+then
+
+	if( Heating_Solar_Pump_State.state != Uninitialized && Heating_Solar_Reheating_State.state != Uninitialized )
+	{
+		var String msg = ""
+		
+		if( Heating_Solar_Pump_State.state == 1 ) msg = msg + "an"
+		else msg = msg + "aus"
+	
+		msg = msg + ", "
+		
+		if( Heating_Solar_Reheating_State.state == 1 ) msg = msg + "an"
+		else msg = msg + "aus"
+		
+		if( Heating_Solar_State_Message.state != msg )
+		{
+			postUpdate(Heating_Solar_State_Message,msg)
+		}
+	}
+end
+
+rule "Solar Hours"
+when
+   	Time cron "15 0 0 * * ?"
+   	or
+   	Item Heating_Solar_Hours changed
+then
+
+	var DecimalType start = Heating_Solar_Hours.historicState(now.toDateMidnight).state as DecimalType
+	var DecimalType aktuell = Heating_Solar_Hours.state as DecimalType
+	if( start > 0 && aktuell > 0 )
+	{
+		var DecimalType differenz = new DecimalType( aktuell - start )
+		var String msg = differenz.format("%.0f") +" h, " + aktuell.format("%.0f")+" h"
+		if( Heating_Solar_Hours_Message.state != msg )
+		{
+			postUpdate(Heating_Solar_Hours_Message,msg)
+		}
+	}
+end
+
+rule "Last Solar Power per day"
+when
+   	Time cron "0 59 23 * * ?"
+then
+
+	var DecimalType start = Heating_Solar_Power.historicState(now.toDateMidnight).state as DecimalType
+	var DecimalType aktuell = Heating_Solar_Power.state as DecimalType
+	if( start > 0 && aktuell > 0 )
+	{
+		var DecimalType value = (aktuell - start)
+		if(Heating_Solar_Power_Last.state != value)
+		{
+			postUpdate(Heating_Solar_Power_Last,value )
+		}
+	}
+end
+
+rule "Solar Power"
+when
+   	Time cron "15 0 0 * * ?"
+   	or
+   	Item Heating_Solar_Power changed
+then
+
+	var DecimalType start = Heating_Solar_Power.historicState(now.toDateMidnight).state as DecimalType
+	var DecimalType aktuell = Heating_Solar_Power.state as DecimalType
+	if( start > 0 && aktuell > 0 )
+	{
+		var DecimalType differenz = new DecimalType( aktuell - start )
+		postUpdate(Heating_Solar_Power_Current, differenz )
+		var String msg = differenz.format("%.0f") +" KW, " + aktuell.format("%.0f") + " KW"
+		if(Heating_Solar_Power_Message.state != msg )
+		{
+			postUpdate(Heating_Solar_Power_Message, msg)
+		}
+	}
+end
+
+rule "Solar Power 5min"
+when
+   	Time cron "45 */5 * * * ?"
+then
+
+	var DecimalType start = Heating_Solar_Power.historicState(now.minusMinutes(30)).state as DecimalType
+	var DecimalType aktuell = Heating_Solar_Power.state as DecimalType
+	if( start > 0 && aktuell > 0 )
+	{
+		var DecimalType value = ((aktuell - start) / 6)
+		if( Heating_Solar_Power_Current5Min.state != value )
+		{
+			postUpdate(Heating_Solar_Power_Current5Min, value )
+		}
+	}
+end
+
+rule "Temperature Check"
+when
+	Item Temperature_Livingroom changed
+	or
+   	Item Temperature_Bedroom changed
+	or
+   	Item Temperature_Garden_Forecast changed
+	or
+	Time cron "0 0 * * * ?"
+then
+	logInfo("heizungscheck",">>>")
+	
+	var Number day    = now.getDayOfWeek
+	var Number hour   = now.getHourOfDay
+	var Number minute = now.getMinuteOfHour
+	
+	var boolean isReduced = false
+	
+	// Freitag
+	if( day == 5 )
+	{
+		if( hour < 4 || hour >= 21 ) isReduced = true
+	}
+	// Samstag
+	else if( day == 6 )
+	{
+		if( hour < 6 || hour >= 21 ) isReduced = true
+	}
+	// Sonntag
+	else if( day == 7 )
+	{
+		if( hour < 6 || hour >= 20 ) isReduced = true
+	}
+	else
+	{
+		if( hour < 4 || hour >= 20 ) isReduced = true
+	}
+
+	var DecimalType heatingTarget = (Heating_Temperature_Room_Target.state as DecimalType)
+	
+	if( isReduced )
+	{
+		heatingTarget = new DecimalType( heatingTarget - 2.0 )
+	}	
+
+	// Calculate weather forecast based reduction
+	var DecimalType forecastDiff = new DecimalType( heatingTarget - Temperature_Garden_Forecast.state )
+	if( forecastDiff < 10 )
+	{
+		if( forecastDiff <= 0 ) forecastDiff = 1;
+
+		// Flip value => Convert range 9 to 1 to range 1 to 9
+		// 1 => coldest forecast
+		// 9 => warmest forecast
+		var DecimalType forecastScale = ((forecastDiff - 10) * -1)
+		
+		var Boolean isForecastReduced = false;
+		
+		// check for a minimum heating time
+		if( Heating_Operating_Mode.state == 2 )
+		{
+			// 3 hours => on coldest forecast
+			// 0,5 hours => on warmest forecast
+			var DecimalType lastOperationModeChange = new DecimalType( 180 / forecastScale )
+			if( lastOperationModeChange > 0 && !Heating_Operating_Mode.changedSince(now.minusMinutes(lastOperationModeChange.intValue))
+			{
+				isForecastReduced = true
+			}
+		}
+		// check for the maximum heating break
+		else
+		{
+			// 0,75 hour => on coldest forecast
+			// 6,75 hours => on warmest forecast
+			var DecimalType lastOperationModeChange = new DecimalType( 45 * forecastScale )
+			if( lastOperationModeChange > 0 && Heating_Operating_Mode.changedSince(now.minusMinutes(lastOperationModeChange.intValue))
+			{
+				isForecastReduced = true
+			}
+		}
+		
+		if( isForecastReduced )
+		{
+			var DecimalType forecastBasedReduction = new DecimalType( Math::round( (forecastScale * 10 / 5).floatValue ).doubleValue / 10)
+			heatingTarget = new DecimalType( heatingTarget - forecastBasedReduction )
+		
+			logInfo("heizungscheck","Forecast based reduction: " + forecastBasedReduction.format("%.2f") +"°, forecast: "+ Temperature_Garden_Forecast.state.format("%.2f") +"°")
+		}
+	}
+	
+	var DecimalType livingroomTarget = heatingTarget
+	var DecimalType bedroomTarget = new DecimalType( heatingTarget - 3.0 )
+
+	var String msg = ""
+
+	var DecimalType livingroomMin = Temperature_Livingroom.minimumSince(now.minusMinutes(30)).state as DecimalType
+	livingroomMin = new DecimalType( Math::round( (livingroomMin * 10).floatValue ).doubleValue / 10) 
+	var DecimalType livingroomMax = Temperature_Livingroom.maximumSince(now.minusMinutes(30)).state as DecimalType
+	livingroomMax = new DecimalType( Math::round( (livingroomMax * 10).floatValue ).doubleValue / 10)
+	var DecimalType livingroomCurrent = Temperature_Livingroom.state as DecimalType
+	livingroomCurrent = new DecimalType( Math::round( (livingroomCurrent * 10).floatValue ).doubleValue / 10)
+	
+	var Boolean isTemperaturOk = true
+
+	// Temperaturanstieg: Wohnzimmer wird wärmer
+	if( livingroomMin < livingroomCurrent - 0.1 )
+	{
+		// 0.1° vorher aufhören
+		if( livingroomCurrent < livingroomTarget - 0.1 )
+		{
+			msg = "WZ is noch nicht warm genug"
+			isTemperaturOk = false
+		}
+		else
+		{
+			msg = "WZ wird zu warm"
+		}
+	}
+	// Temperaturabfall: Wohnzimmer wird kälter
+	else if( livingroomMax > livingroomCurrent + 0.1 )
+	{
+		// bei Solltemperatur wieder anfangen
+		if( livingroomCurrent <= livingroomTarget )
+		{
+			msg = "WZ wird zu kalt"
+			isTemperaturOk = false
+		}
+		else
+		{
+			msg = "WZ is noch zu warm"
+		}
+	}
+	// Kein großer Temperaturanstieg oder Temperaturabstieg
+	else
+	{
+		if( livingroomCurrent < livingroomTarget )
+		{
+			msg = "WZ ist zu kalt"
+			isTemperaturOk = false
+		}
+		else
+		{
+			msg = "WZ ist warm genug"
+		}
+	}
+
+	logInfo("heizungscheck",msg + " - " + livingroomCurrent.format("%.2f") +"° (soll: "+livingroomTarget.format("%.2f")+"°, max: "+ livingroomMax.format("%.2f") +"°, min: "+ livingroomMin.format("%.2f") +"°)")
+
+	msg = ""
+
+	var DecimalType bedroomMin = Temperature_Bedroom.minimumSince(now.minusMinutes(30)).state as DecimalType
+	bedroomMin = new DecimalType( Math::round( (bedroomMin * 10).floatValue ).doubleValue / 10)
+	var DecimalType bedroomMax = Temperature_Bedroom.maximumSince(now.minusMinutes(30)).state as DecimalType
+	bedroomMax = new DecimalType( Math::round( (bedroomMax * 10).floatValue ).doubleValue / 10)
+	var DecimalType bedroomCurrent = Temperature_Bedroom.state as DecimalType
+	bedroomCurrent = new DecimalType( Math::round( (bedroomCurrent * 10).floatValue ).doubleValue / 10)
+
+	// Temperaturanstieg: Schlafzimmer wird wärmer
+	if( bedroomMin < bedroomCurrent - 0.1 )
+	{
+		// 0.1° vorher aufhören
+		if( bedroomCurrent < bedroomTarget - 0.1 )
+		{
+			msg = "SZ is noch nicht warm genug"
+			isTemperaturOk = false
+		}
+		else
+		{
+			msg = "SZ wird zu warm"
+		}
+	}
+	// Temperaturabfall: Schlafzimmerzimmer wird kälter
+	else if( bedroomMax > bedroomCurrent + 0.1 )
+	{
+		// bei Solltemperatur wieder anfangen
+		if( bedroomCurrent <= bedroomTarget )
+		{
+		    msg = "SZ wird zu kalt"
+		    isTemperaturOk = false
+		}
+		else
+		{
+		    msg = "SZ is noch zu warm"
+		}
+	}
+	// Kein großer Temperaturanstieg oder Temperaturabstieg
+	else
+	{
+		if( bedroomCurrent < bedroomTarget )
+		{
+			msg = "SZ ist zu kalt"
+			isTemperaturOk = false
+		}
+		else
+		{
+			msg = "SZ ist warm genug"
+		}
+	}
+	logInfo("heizungscheck",msg + " - "+bedroomCurrent.format("%.2f") +"° (soll: "+bedroomTarget.format("%.2f")+"°, max: "+ bedroomMax.format("%.2f") +"°, min: "+ bedroomMin.format("%.2f") +"°)")
+
+	// Aussentemperaturkurve
+	//if( Temperature_Garden_Forecast.state < (Heating_Temperature_Room_Target.state as DecimalType) - 4 ){
+	//}
+		
+	//logInfo("heizungscheck",""+isTemperaturTooLow)
+		
+	logInfo("heizungscheck","Temp OK: "+isTemperaturOk )
+
+	if( isTemperaturOk )
+	{
+		if( Heating_Temperature_Overall_OK.state != 1 )
+		{
+			postUpdate( Heating_Temperature_Overall_OK, 1 )
+		}
+	}
+	else if( Heating_Temperature_Overall_OK.state != 0 )
+	{
+		postUpdate( Heating_Temperature_Overall_OK , 0 )
+	}
+	if( livingroomTarget != Heating_Temperature_Livingroom_Target.state )
+	{
+		postUpdate( Heating_Temperature_Livingroom_Target, livingroomTarget )
+	}
+	if( bedroomTarget != Heating_Temperature_Bedroom_Target.state )
+	{
+		postUpdate( Heating_Temperature_Bedroom_Target, bedroomTarget )
+	}
+	logInfo("heizungscheck","<<<")
+end
+
+rule "heating mode check"
+when
+	Item Heating_Auto_Mode changed
+	or
+	Time cron "30 */2 * * * ?"
+then
+
+	if( Heating_Auto_Mode.state == 1 && Heating_Operating_Mode.state != Uninitialized && Heating_Circuit_Pump_Speed.state != Uninitialized && Heating_Power.state != Uninitialized  && Heating_Burner_Starts.state != Uninitialized )
+	{
+		logInfo("heizungscheck",">>>")
+		logInfo("heizungscheck","Temp OK: "+(Heating_Temperature_Overall_OK.state == 1)+" - Temp Stabil: "+(!Heating_Temperature_Overall_OK.changedSince(now.minusMinutes(15)))+" - Betriebsart: "+Heating_Operating_Mode.state+" - Leistung: "+Heating_Power.state)
+
+		// 0 - Abschalten
+		// 1 - Nur WW
+		// 2 - Heizen mit WW
+		// 3 - Reduziert
+		// 4 - Normal
+		
+		var Integer minTempChangeMinutes = 15	// Temperaturänderung sollte mindestens 15 min stabil sein
+		var Integer minNurWWChangeMinutes = 15	// 'Nur WW' sollte mindestens 15 min aktiv sein
+		var Integer minMitWWChangeMinutes = 30	// 'Heizen mit WW' sollte mindestens 30 min aktiv sein
+
+		// Nur WW
+		if( Heating_Operating_Mode.state == 1 )
+		{
+			// Temperatur sollte seit XX min nicht OK sein und 'Nur WW' sollte mindestens XX min aktiv sein um 'flattern' zu vermeiden
+			if( Heating_Temperature_Overall_OK.state == 0 && !Heating_Temperature_Overall_OK.changedSince(now.minusMinutes(minTempChangeMinutes)) && !Heating_Operating_Mode.changedSince(now.minusMinutes(minNurWWChangeMinutes)) )
+			{
+				logInfo("heizungscheck","switch to 'Heizung mit WW' after 'Nur WW'")
+				sendCommand(Heating_Operating_Mode,2)
+				createTimer(now.plusSeconds(40)) [|
+					if( Heating_Operating_Mode.state != 2)
+					{
+						logInfo("heizungscheck","retry switch to 'Heizung mit WW' after 'Nur WW'")
+						sendCommand(Heating_Operating_Mode,2)
+					}
+				]
+				//pushover("Heizung: Heizung mit WW")
+			}
+		}
+		// Heizen mit WW
+		else if( Heating_Operating_Mode.state == 2 )
+		{
+			// Wenn Heizkreispumpe auf 0 dann ist Heizen zur Zeit komplett deaktiviert (zu warm draussen) oder Brauchwasser wird aufgeheizt
+			if( Heating_Circuit_Pump_Speed.state > 0 )
+			{	
+				// Temperatur sollte seit XX min OK sein und Brenner sollte entweder nicht laufen oder mindestens XX min am Stück gelaufen sein
+				if( Heating_Temperature_Overall_OK.state == 1 && !Heating_Temperature_Overall_OK.changedSince(now.minusMinutes(minTempChangeMinutes)) && (Heating_Power.state == 0 || !Heating_Operating_Mode.changedSince(now.minusMinutes(minMitWWChangeMinutes))) )
+				{
+					logInfo("heizungscheck","switch to 'Nur WW' after 'Heizung mit WW'")
+					sendCommand(Heating_Livingroom_Circuit,ON)
+					sendCommand(Heating_Operating_Mode,1)
+					createTimer(now.plusSeconds(40)) [|
+						if( Heating_Operating_Mode.state != 1)
+						{
+							logInfo("heizungscheck","retry switch to 'Nur WW' after 'Heizung mit WW'")
+							sendCommand(Heating_Operating_Mode,1)
+						}
+					]
+					//pushover("Heizung: Nur WW")
+				}
+				// Brenner läuft nicht
+				else if( Heating_Power.state == 0 )
+				{
+					// "Reduziert" war in den letzten 5 Minuten aktiv
+					// oder Leistung war innerhalb von 4 oder 5 Minuten ein zweites mal auf 0
+					if( 
+					    (Heating_Operating_Mode.historicState(now.minusMinutes(5)).state == 3 || Heating_Operating_Mode.maximumSince(now.minusMinutes(5)).state == 3)
+					    ||
+					    (Heating_Operating_Mode.historicState(now.minusMinutes(4)).state == 2 && Heating_Power.historicState(now.minusMinutes(4)).state == 0)
+					    ||
+					    (Heating_Operating_Mode.historicState(now.minusMinutes(5)).state == 2 && Heating_Power.historicState(now.minusMinutes(5)).state == 0)
+					)
+					{
+						logInfo("heizungscheck","switch to 'Reduziert' after 'Heizung mit WW'")
+						sendCommand(Heating_Livingroom_Circuit,ON)
+						sendCommand(Heating_Operating_Mode,3)
+						createTimer(now.plusSeconds(40)) [|
+							if( Heating_Operating_Mode.state != 3)
+							{
+								logInfo("heizungscheck","retry switch to 'Reduziert' after 'Heizung mit WW'")
+								sendCommand(Heating_Operating_Mode,3)
+							}
+						]		
+						//pushover("Heizung: Reduziert")
+					}
+				}
+				else if( !Heating_Temperature_Overall_OK.changedSince(now.minusMinutes(minTempChangeMinutes)) )
+				{
+					// Wenn Kreis an... Überprüfe ob es im WZ zu warm ist
+					if( Heating_Livingroom_Circuit.state == ON )
+					{
+						if( 
+							Temperature_Livingroom.state > (Heating_Temperature_Room_Target.state as DecimalType) + 0.2
+							&&
+							!Heating_Operating_Mode.changedSince(now.minusMinutes(10)))
+						{
+							logInfo("heizungscheck",">>>>switch Wohnzimmerkreis OFF")
+							sendCommand(Heating_Livingroom_Circuit,OFF)
+							//pushover("Heizung: Wohnzimmer Kreis Aus")
+						}
+					}
+					// Wenn Kreis aus... überprüfe ob es im WZ zu kalt ist
+					else if( Temperature_Livingroom.state < (Heating_Temperature_Room_Target.state as DecimalType) + 0.2 )
+					{
+						logInfo("heizungscheck",">>>>switch Wohnzimmerkreis ON")
+						sendCommand(Heating_Livingroom_Circuit,ON)
+						//pushover("Heizung: Wohnzimmer Kreis An")
+					}
+				}
+			}
+		}
+		// Reduziert
+		else if( Heating_Operating_Mode.state == 3 )
+		{
+			// Wenn Temperatur seit XX min OK ist und der brenner sowieso aus ist kann gleich in 'Nur WW' gewechselt werden
+			if( Heating_Temperature_Overall_OK.state == 1 && !Heating_Temperature_Overall_OK.changedSince(now.minusMinutes(minTempChangeMinutes)) )
+			{
+				logInfo("heizungscheck","switch to 'Nur WW' after 'Reduziert'. Temperature reached max value")
+				sendCommand(Heating_Operating_Mode,1)
+				createTimer(now.plusSeconds(40)) [|
+					if( Heating_Operating_Mode.state != 1) 
+					{
+						logInfo("heizungscheck","retry switch to 'Reduziert' after 'Heizung mit WW'")
+						sendCommand(Heating_Operating_Mode,1)
+					}
+				]
+				//pushover("Heizung: Nur WW")
+			}
+			else
+			{
+				// 'timeInterval' ist zwischen 10 und 60 min, je nach Aussentemperatur
+				
+				var Integer timeInterval = 10
+				if( Temperature_Garden_Forecast.state > 0 )
+				{
+					timeInterval = Math::floor( (( (Temperature_Garden_Forecast.state as DecimalType) * 50 / 20 ) + 10).doubleValue ).intValue
+					if( timeInterval > 60 ) timeInterval = 60
+				}
+				
+				// Dauernd reduziert läuft seit mindestens XX Minuten
+				if( !Heating_Operating_Mode.changedSince(now.minusMinutes(timeInterval)) )
+				{
+					logInfo("heizungscheck","switch to 'Heizung mit WW' after "+timeInterval+" minutes 'Reduziert'")
+					sendCommand(Heating_Operating_Mode,2)
+					createTimer(now.plusSeconds(40)) [|
+						if( Heating_Operating_Mode.state != 2)
+						{
+							logInfo("heizungscheck","retry switch to 'Heizung mit WW' after 'Reduziert'")
+							sendCommand(Heating_Operating_Mode,2)
+						}
+					]
+					//pushover("Heizung: Heizung mit WW")
+				}
+			}
+		}
+
+		logInfo("heizungscheck","<<<")
+	}
+end

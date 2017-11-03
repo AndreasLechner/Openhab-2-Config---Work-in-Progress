@@ -1,0 +1,37 @@
+import org.openhab.core.library.types.*
+import org.openhab.core.persistence.*
+import org.openhab.model.script.actions.*
+import java.lang.Math
+
+rule "Holiday lights on at the evening"
+when
+	Time cron "0 0 19 * * ?"
+then
+	if( Auto_Holiday.state == ON )
+	{
+		sendCommand(Light_FF_Livingroom_Couch, 40)
+	}
+end
+
+rule "Holiday lights on before going sleeping"
+when
+	Time cron "0 0 22 * * ?"
+then
+	if( Auto_Holiday.state == ON )
+	{
+		sendCommand(Light_FF_Livingroom_Couch, OFF)
+		sendCommand(Light_FF_Floor_Ceiling, ON)
+	}
+end
+
+rule "Holiday lights off"
+when
+	Time cron "0 30 22 * * ?"
+then
+	if( Auto_Holiday.state == ON )
+	{
+		Lights_FF.members.forEach(kreis|{                       
+			postUpdate(kreis, OFF)
+		})
+	}
+end

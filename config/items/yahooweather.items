@@ -1,0 +1,24 @@
+/* File: 			YahooWeather.items
+ * Autor: 			Andreas Lechner
+ * Company: 		IT Lechner
+ * Date:			26-10-2017
+ * Info:			http://www.lechnerandreas.com
+ * Description: 	DE:		In dieser Datei werden die Items für das YahooWeather Binding definiert 
+ * 					EN:		This file contains items definitions for YahooWeather Binding
+ */
+
+/* ITEM DEFINITION YAHOO WEATHER */
+
+
+// Group Definitions
+Group gWetter "Wetterinformationen"			<weather>		(gAlle, gGeschichte, gAktuell, gDiagramm)
+
+
+// Number Definitions
+Number Aburg_Temperatur 		"Aussentemperatur [%.1f °C]" 	<temperature> 	(gWetter) 	{ channel="yahooweather:weather:Aschaffenburg:temperature" }
+Number Aburg_Feuchtigkeit 		"Luftfeuchtigkeit [%d %%]" 		<humidity>    	(gWetter) 	{ channel="yahooweather:weather:Aschaffenburg:humidity" }
+Number Aburg_Luftdruck 			"Luftdruck [%.1f mbar]" 		<pressure> 		(gWetter) 	{ channel="yahooweather:weather:Aschaffenburg:pressure" }
+
+Number LdkAburg_Temperatur 		"Aussentemperatur [%.1f °C]" 	<temperature> 	(gWetter) 	{ channel="yahooweather:weather:LdkAburg:temperature" }
+Number LdkAburg_Feuchtigkeit	"Luftfeuchtigkeit [%d %%]" 		<humidity> 		(gWetter) 	{ channel="yahooweather:weather:LdkAburg:humidity" }
+Number LdkAburg_Luftdruck 		"Luftdruck [%.1f mbar]" 		<pressure> 		(gWetter) 	{ channel="yahooweather:weather:LdkAburg:pressure" }

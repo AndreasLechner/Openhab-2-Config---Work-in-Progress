@@ -1,0 +1,57 @@
+/* File: 			astro.items
+ * Autor: 			Andreas Lechner
+ * Company: 		IT Lechner
+ * Date:			26-10-2017
+ * Info:			http://www.lechnerandreas.com
+ * Description: 	DE:		In dieser Datei werden die Items für das Astro Binding definiert 
+ * 					EN:		This file contains items definitions for astro binding
+ */
+
+/* ASTRO ITEM DEFINITION */
+
+
+// Group Definitions
+Group 		gAstro      				"Astronomische Informationen"							<sun_clouds>		(gAlle)
+Group 		gSonne						"Daten Sonne"											<sun>				(gAstro, gAktuell, gGeschichte, gDiagramm)
+Group		gMond						"Daten Mond"											<moon>				(gAstro, gAktuell, gGeschichte, gDiagramm)
+
+
+/* SONNEN DATEN - SUN DATA */
+// DateTime Sonne
+DateTime 	SonnenAufgangStart			"Sonnenaufgang Feldkahl Beginn: [%1$tH:%1$tM]"  		<sun>				(gAstro)	{ channel="astro:sun:Feldkahl:rise#start" }
+DateTime 	SonnenAufgangEnde			"Sonnenaufgang Feldkahl Ende: [%1$tH:%1$tM]"  			<sun>				(gAstro)	{ channel="astro:sun:Feldkahl:rise#end" }
+DateTime 	SonnenUntergangStart   		"Sonnenuntergang Feldkahl Beginn: [%1$tH:%1$tM]"   		<sun>				(gAstro)	{ channel="astro:sun:Feldkahl:set#start" }
+DateTime 	SonnenUntergangEnde   		"Sonnenuntergang Feldkahl Ende: [%1$tH:%1$tM]"   		<sun>				(gAstro)	{ channel="astro:sun:Feldkahl:set#end" }
+DateTime    Abends         				"Abend [%1$tH:%1$tM]"                            		<sun>       		(gAstro) 	{ channel="astro:sun:Feldkahl:set#start"}
+
+// Number Sonne - Number Sun
+Number   	Azimuth            			"Sonnenuntergang"        								<sun>				(gAstro)	{ channel="astro:sun:Feldkahl:position#azimuth" }
+Number   	Total_Radiation    			"Radiation"              								<sun>				(gAstro)	{ channel="astro:sun:Feldkahl:radiation#total" }
+Number   	Diffuse_Radiation  			"Diffuse Radiation"     		 						<sun>				(gAstro)	{ channel="astro:sun:Feldkahl:radiation#diffuse" }
+Number      Aktueller_Sonnenstand   	"Sonnenstand [%.1f °]"                            		<sun>    			(gAstro) 	{ channel="astro:sun:Feldkahl:position#elevation"}
+
+// String Sonne - String Sun
+String      Tageszeit            		"Aktuelle Phase des Tages [MAP(astro.map):%s]"          <sun>       		(gAstro) 	{ channel="astro:sun:Feldkahl:phase#name"}
+String      Jahreszeit          		"Aktuelle Jahreszeit [MAP(astro.map):%s]"                              		(gAstro) 	{ channel="astro:sun:Feldkahl:season#name"}
+String      Sternzeichen          		"Sternzeichen (Zodiac) [MAP(astro.map):%s]"             <zodiac> 			(gAstro) 	{ channel="astro:sun:Feldkahl:zodiac#sign"}
+
+/* MOND DATEN - MOON DATA */
+// DateTime Mond - DateTime Moon
+DateTime 	ZeitMondAufgangStart  		"Mondaufgang Feldkahl Beginn: [%1$tH:%1$tM]"  			<moon>				(gAstro)	{ channel="astro:moon:Feldkahl:rise#start" }
+DateTime 	ZeitMondAufgangEnde   		"Mondaufgang Feldkahl Ende: [%1$tH:%1$tM]"  			<moon>				(gAstro)	{ channel="astro:moon:Feldkahl:rise#end" }
+DateTime 	ZeitMondUntergang      		"Monduntergang Feldkahl [%1$tH:%1$tM]"   				<moon>				(gAstro)	{ channel="astro:moon:Feldkahl:set#start" }
+DateTime    Vollmond       				"Nächster Vollmond [%1$td.%1$tm.%1$tY, %1$tH:%1$tM]" 	<moon>   			(gAstro) 	{ channel="astro:moon:Feldkahl:phase#full"}
+DateTime    Neumond        				"Nächster Neumond [%1$td.%1$tm.%1$tY, %1$tH:%1$tM]"  	<moon>   			(gAstro) 	{ channel="astro:moon:Feldkahl:phase#new"}
+
+// Number Mond - Number Moon
+Number      Aktueller_Mondstand    		"Moon Elevation [%.1f °]"                          		<moon>   			(gAstro) 	{ channel="astro:moon:Feldkahl:position#elevation"}
+
+// String Mond - String Moon
+String      MondPhase           		"Aktuelle Mond Phase [MAP(astro.map):%s]"               <moon>   			(gAstro) 	{ channel="astro:moon:Feldkahl:phase#name"}
+
+
+Switch      Nacht_Status          		"Nacht"                                                             		(gAstro)
+//
+Number      MondEntfernung           	"Enfernung Mond -> Erde"               					<moon>   			(gAstro) 	{ channel="astro:moon:Feldkahl:distance#kilometer"}
+
+

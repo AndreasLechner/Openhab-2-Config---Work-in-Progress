@@ -1,0 +1,68 @@
+import org.openhab.core.library.types.*
+import org.openhab.core.persistence.*
+import org.openhab.model.script.actions.*
+import org.joda.time.*
+import java.lang.Math
+
+var DateTime letzteAblesungDatum = parse("2014-10-22")
+var Number letzteAblesungWert = 4434
+var Number letzteAblesungJahresverbrauch = 2505
+
+rule "Last daily electricity consumption"
+when
+   	Time cron "0 59 23 * * ?"
+then
+	var Number value = (Electricity_Meter.state as DecimalType) - (Electricity_Meter.historicState(now.toDateMidnight).state as DecimalType)
+	if( Electricity_Last_Daily_Consumption.state != value )
+	{
+		postUpdate(Electricity_Last_Daily_Consumption, value )
+	}
+end
+
+rule "Stromverbrauch"
+when
+	Item Electricity_Meter received update
+then
+//	logInfo("strom","start1")
+//	Electricity_Meter.state
+//	logInfo("strom","start2")
+//	Electricity_Meter.historicState(now).state
+//	logInfo("strom","start3")
+//	Electricity_Meter.historicState(now.toDateMidnight).state
+//	logInfo("strom","start4")
+	
+	var Number Aktuell_Zaehler = Electricity_Meter.state as DecimalType
+
+	// Jahresverbrauch
+	var Number aktuellerJahresverbrauch = Aktuell_Zaehler - letzteAblesungWert
+	if( Electricity_Annual_Consumption.state != aktuellerJahresverbrauch )
+	{
+		postUpdate( Electricity_Annual_Consumption, aktuellerJahresverbrauch )
+	}
+	
+	// Hochrechnung
+	var Number aktuellesJahrMillis = now.getMillis - letzteAblesungDatum.getMillis
+	var Number ganzesJahrMillis = 31536000000l
+	var Number hochrechnungVerbrauch = Math::round((ganzesJahrMillis * aktuellerJahresverbrauch / aktuellesJahrMillis).doubleValue)
+	var String msg = hochrechnungVerbrauch + " KWh, " + letzteAblesungJahresverbrauch + " KWh"
+	if( Electricity_Forecast.state != msg )
+	{
+		postUpdate( Electricity_Forecast, msg )
+	}
+	
+	// Aktueller Verbrauch
+        // durch 3 teilen weil die Berechnungsbasis 5 ist und nicht 15
+	var Number Letzter_Zaehler = Electricity_Meter.historicState(now.minusMinutes(15)).state as DecimalType
+	var Number Aktuell = Math::round((( ( Aktuell_Zaehler - Letzter_Zaehler ) / 3 ) * 12 * 1000).doubleValue)
+	if( Electricity_Current_Consumption.state != Aktuell )
+	{
+		postUpdate(Electricity_Current_Consumption, Aktuell )
+	}
+	
+	// Tagesverbrauch
+	var Number dailyConsumption = Aktuell_Zaehler - Electricity_Meter.historicState(now.toDateMidnight).state as DecimalType
+	if( Electricity_Current_Daily_Consumption.state != dailyConsumption )
+	{
+		postUpdate(Electricity_Current_Daily_Consumption, dailyConsumption )
+	}
+end

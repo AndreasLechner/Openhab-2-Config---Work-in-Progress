@@ -1,0 +1,15 @@
+/* File: 			persistent.items
+ * Autor: 			Andreas Lechner
+ * Company: 		IT Lechner
+ * Date:			31-10-2017
+ * Info:			http://www.lechnerandreas.com
+ * Description: 	DE:		In dieser Datei werden die Persistent Items definiert 
+ * 					EN:		This file contains the persistent items definitions
+ */
+
+/* PERSISTENT ITEM DEFINITION */
+
+Group gGeschichte 				"Speicherung in der Persistence - Geschichte"	
+Group gAktuell 					"Speicherung in der Persistence - Aktuelle"		
+Group gDiagramm 				"Speicherung in der Persistence - Diagramme"		
+

@@ -1,0 +1,242 @@
+import org.openhab.core.library.types.*
+import org.openhab.core.persistence.*
+import org.openhab.model.script.actions.*
+import java.lang.Math
+
+rule "Air livingroom"
+when
+	Item Temperature_Livingroom changed
+	or
+	Item Humidity_Livingroom changed
+	or
+	Item Heating_Temperature_Livingroom_Target changed
+then
+	if( Heating_Temperature_Livingroom_Target.state != Uninitialized && Temperature_Livingroom.state != Uninitialized && Humidity_Livingroom.state != Uninitialized )
+	{
+		var String msg = "(" + Heating_Temperature_Livingroom_Target.state.format("%.1f") + "°C) " + Temperature_Livingroom.state.format("%.1f") +"°C, " + Humidity_Livingroom.state.format("%.1f") + "%"
+		if( Air_Livingroom_Message.state != msg )
+		{
+			postUpdate(Air_Livingroom_Message,msg)
+		}
+	}
+end
+
+rule "Air bedroom"
+when
+	Item Temperature_Bedroom changed
+	or
+	Item Humidity_Bedroom changed
+	or
+	Item Heating_Temperature_Bedroom_Target changed
+then
+	if( Heating_Temperature_Bedroom_Target.state != Uninitialized && Temperature_Bedroom.state != Uninitialized && Humidity_Bedroom.state != Uninitialized )
+	{
+		var String msg = "(" + Heating_Temperature_Bedroom_Target.state.format("%.1f") + "°C) " + Temperature_Bedroom.state.format("%.1f") + "°C, " + Humidity_Bedroom.state.format("%.1f") + "%"
+		if( Air_Bedroom_Message.state != msg )
+		{
+			postUpdate(Air_Bedroom_Message,msg)
+		}
+	}
+end
+
+rule "Air floor"
+when
+	Item Temperature_Floor changed
+	or
+	Item Humidity_Floor changed
+then
+	if( Temperature_Floor.state != Uninitialized && Humidity_Floor.state != Uninitialized )
+	{
+		var String msg = Temperature_Floor.state.format("%.1f") +"°C, " + Humidity_Floor.state.format("%.1f") + "%"
+		if( Air_Floor_Message.state != msg )
+		{
+			postUpdate(Air_Floor_Message,msg)
+		}
+	}
+end
+
+rule "Air attic"
+when
+	Item Temperature_Attic changed
+	or
+	Item Humidity_Attic changed
+then
+	if( Temperature_Attic.state != Uninitialized && Humidity_Attic.state != Uninitialized )
+	{
+		var String msg = Temperature_Attic.state.format("%.1f") +"°C, " + Humidity_Attic.state.format("%.1f") + "%"
+		if( Air_Attic_Message.state != msg )
+		{
+			postUpdate(Air_Attic_Message,msg)
+		}
+	}
+end
+
+rule "Air garage"
+when
+	Item Temperature_Garage changed
+	or
+	Item Humidity_Garage changed
+then
+	if( Temperature_Garage.state != Uninitialized && Humidity_Garage.state != Uninitialized )
+	{
+		var String msg = Temperature_Garage.state.format("%.1f") +"°C, " + Humidity_Garage.state.format("%.1f") + "%"
+		if( Air_Garage_Message.state != msg )
+		{
+			postUpdate(Air_Garage_Message,msg)
+		}
+	}
+end
+
+rule "Air garden"
+when
+	Item Temperature_Garden changed
+	or
+	Item Humidity_Garden changed
+then
+	if( Temperature_Garden.state != Uninitialized && Humidity_Garden.state != Uninitialized )
+	{
+		var String msg = Temperature_Garden.state.format("%.1f") +"°C, " + Humidity_Garden.state.format("%.1f") + "%"
+		if( Air_Garden_Message.state != msg )
+		{
+			postUpdate(Air_Garden_Message,msg)
+		}
+	}
+end
+
+rule "Update garden min max"
+when
+	Time cron "0 5 0 * * ?" 
+	or
+	Item Temperature_Garden changed 
+then	
+	var String msg = Temperature_Garden.minimumSince(now.toDateMidnight).state.format("%.1f") +"°C / " + Temperature_Garden.maximumSince(now.toDateMidnight).state.format("%.1f") + " °C"
+	if( Temperature_Garden_Message.state != msg )
+	{
+		postUpdate(Temperature_Garden_Message,msg)
+	}
+end
+
+rule "Update rain today"
+when
+	Time cron "0 5 0 * * ?"
+	or
+	Item Rain_Garden_Counter changed 
+	or
+	Item Regen_State_Garden changed
+then	
+	if( Rain_Garden_Counter.state != Uninitialized )
+	{
+		var Number zaehlerNeu = Rain_Garden_Counter.state as DecimalType
+		var Number zaehlerAlt = Rain_Garden_Counter.historicState(now.toDateMidnight).state as DecimalType
+		var Number differenz
+		var Number todayRain
+
+		if( zaehlerAlt != zaehlerNeu )
+		{
+			differenz = zaehlerNeu - zaehlerAlt
+			if( differenz < 0 ) differenz = zaehlerNeu
+
+			todayRain = differenz * 295 / 1000
+		}
+		else
+		{
+			todayRain = 0
+		}
+
+		var String msg = new Double((Math::round((todayRain*10).doubleValue).doubleValue/10).doubleValue).toString;
+
+		if( Regen_State_Garden.state != Uninitialized && Regen_State_Garden.state == 1 )
+		{
+			msg = "(Regen) " + msg +" mm"
+		}
+		else
+		{
+			msg = msg +" mm"
+		}
+
+		if( Rain_Garden_Message.state != msg )
+		{
+			postUpdate(Rain_Garden_Message, msg)
+		}
+	}
+end
+
+rule "Update rain last hour"
+when
+	Time cron "0 0 * * * ?"
+then
+	if( Rain_Garden_Counter.state != Uninitialized )
+	{
+		var Number zaehlerNeu = Rain_Garden_Counter.state as DecimalType
+		var Number zaehlerAlt = Rain_Garden_Counter.historicState(now.minusHours(1)).state as DecimalType
+		var Number differenz
+		var Number lastHourRain
+
+		if( zaehlerAlt != zaehlerNeu )
+		{
+			differenz = zaehlerNeu - zaehlerAlt
+			if( differenz < 0 ) differenz = zaehlerNeu
+			lastHourRain = differenz * 295 / 1000
+		}
+		else
+		{
+			lastHourRain = 0
+		}
+		if( Rain_Garden_Current.state != lastHourRain )
+		{
+			postUpdate(Rain_Garden_Current, lastHourRain)
+		}
+	}
+end
+
+rule "Rain convert"
+when
+	Item Wind_Garden changed 
+then
+	if( Wind_Garden.state != Uninitialized )
+	{
+		var Number msg = Math::round(((Wind_Garden.state as DecimalType) * 3.6).doubleValue)
+		if( Wind_Garden_Converted.state != msg )
+		{
+			postUpdate(Wind_Garden_Converted,msg)
+		}
+	}
+end
+
+rule "Update wind last 15 minutes"
+when
+	Time cron "0 */15 * * * ?"
+then
+	if( Wind_Garden_Converted.state != Uninitialized )
+	{
+		var Number msg = Wind_Garden_Converted.maximumSince(now.minusMinutes(15)).state
+		if( Wind_Garden_Current.state != msg )
+		{
+			postUpdate(Wind_Garden_Current,msg)
+		}
+	}
+end
+
+rule "Wind"
+when
+	Item Wind_Garden_Converted changed
+	or
+	Item Wind_Direction changed
+then
+	if( Wind_Garden_Converted.state != Uninitialized && Wind_Direction.state != Uninitialized )
+	{
+		var String msg = ""
+		if(Wind_Garden_Converted.state == 0 )
+		{
+			msg = "Ruhig"
+		}
+		else
+		{
+			msg = Wind_Garden_Converted.state.format("%.1f") +" km/h, " + Wind_Direction.state
+		}
+		if( Wind_Message.state != msg )
+		{
+			postUpdate(Wind_Message,msg)
+		}
+	}
+end

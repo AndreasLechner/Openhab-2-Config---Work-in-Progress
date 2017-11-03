@@ -1,0 +1,197 @@
+import org.joda.time.*
+import org.openhab.core.library.types.*
+import org.openhab.core.persistence.*
+import org.openhab.model.script.actions.*
+
+var Integer sleepDuration = 10
+var Integer timerDuration = 15 
+var Timer timerAway = null
+var Timer timerSleep = null
+
+rule "Periodically check presence"
+when
+	Time cron "0 */5 * * * ?"
+then
+	if (Device_Present.state == ON)
+	{
+		if(Phones.members.filter(s | s.state == ON).size == 0) 
+		{
+			logInfo("PresenceCheck", "No phone within reach, checking for flapping")
+			if(Phones.members.filter(s | s.changedSince(now.minusMinutes(5))).size == 0) 
+			{
+				sendCommand(Device_Present, OFF)
+			}
+		}
+	}
+	else
+	{
+		//For initialisation. If Presence is undefined or off, although it should be on.
+		if(Phones.members.filter(s | s.state == ON).size > 0) 
+		{
+			sendCommand(Device_Present, ON)
+		}
+		else if (Device_Present.state == Undefined || Device_Present.state == Uninitialized) 
+		{
+			sendCommand(Device_Present, OFF)
+		}
+	}
+end
+
+rule "Phone changing"
+when
+	Item Phones changed
+then
+	if (Device_Present.state != ON) 
+	{
+		if(Phones.members.filter(s | s.state == ON).size > 0) 
+		{
+			sendCommand(Device_Present, ON)
+		}
+	}
+end
+
+rule "Presence changing"
+when
+	Item Device_Present changed
+then
+	if( Device_Present.state == ON )
+	{
+		logInfo("PresenceCheck", "Jemand ist zu Hause")
+	}
+	else
+	{
+		logInfo("PresenceCheck", "Niemand zu Hause")
+	}
+end
+
+rule "Away check"
+when
+	Item Door_FF_Floor received update CLOSED
+then
+	//or
+	//Time cron "0 */1 * * * ?"
+	if( Window_FF_Livingroom_Terrace.state == CLOSED )
+	{
+		if( timerAway != null )
+		{
+			timerAway.cancel
+			timerAway = null
+		}
+		timerAway = createTimer(now.plusSeconds(timerDuration)) [|
+			
+			timerAway = null
+			
+			var isPresent = Motiondetector_FF_Floor.state == OPEN
+			if( !isPresent )
+			{
+				var doorUpdated = Door_FF_Floor.lastUpdate
+				//logInfo("test","test" + doorUpdated)
+				//logInfo("test","test" + (new DateTime(doorUpdated).plusSeconds(5)))
+
+				// OPEN event until 3 seconds after door close and the following CLOSE event 2 seconds later should be ignored
+				// CLOSE event after that or a new OPEN event is a sign for in house activity
+				isPresent = new DateTime(Motiondetector_FF_Floor.lastUpdate).isAfter( new DateTime(doorUpdated).plusSeconds(5) )
+				
+				if( !isPresent )
+				{
+					isPresent = Motiondetector_FF_Livingroom.lastUpdate.after( doorUpdated )
+				}
+			}
+			
+			// motion is still present or was after door closed
+			if( isPresent )
+			{
+				//logInfo("AwayCheck", "OFF")
+				if( State_Away.state != OFF )
+				{
+					//logInfo("AwayCheck", "OFF PUSH")
+					postUpdate(State_Away, OFF)
+				}
+			}
+			else
+			{
+				//logInfo("AwayCheck", "ON")
+				if( State_Away.state != ON )
+				{
+					//logInfo("AwayCheck", "ON PUSH")
+					postUpdate(State_Away, ON)
+				}
+			}
+		]
+	}
+end
+
+rule "Motion check"
+when
+	Item Motiondetector_FF_Livingroom received update OPEN
+	or
+	Item Motiondetector_FF_Floor received update OPEN
+then
+	if( State_Away.state != OFF )
+	{
+		//logInfo("MotionCheck", "NOT AWAY")
+		postUpdate(State_Away, OFF)
+	}
+	
+	if( State_Sleeping.state != OFF )
+	{
+		//logInfo("MotionCheck", "WAKEUP")
+		postUpdate(State_Sleeping, OFF)
+	}
+end
+
+rule "Away rule"
+when
+	Item State_Away changed
+then
+	if( State_Away.state == ON )
+	{
+		if( State_Sleeping.state != OFF )
+		{
+			postUpdate(State_Sleeping, OFF)
+		}
+		if( State_Notify.state != ON )
+		{
+			postUpdate(State_Notify, ON)
+		}
+	}
+end
+
+rule "Sleeping SF check"
+when
+	Item Lights_SF received update OFF
+	or
+	Item Light_FF_Floor_Ceiling received update OFF
+then
+	if( State_Sleeping.state != ON )
+	{
+		var Number hour   = now.getHourOfDay
+		if( ( hour <= 4 || hour >= 21 ) && !Motiondetector_FF_Floor.changedSince(now.minusSeconds(sleepDuration)) && Lights_Indoor.members.filter(s | s.state == ON).size == 0 )
+		{
+			if( timerAway == null )
+			{
+				if( State_Away.state == OFF)
+				{
+					postUpdate(State_Sleeping, ON)
+				}
+			}
+			else
+			{
+				if( timerSleep != null )
+				{
+					timerSleep.cancel
+					timerSleep = null
+				}
+				timerSleep = createTimer(now.plusSeconds(timerDuration)) [|
+
+					timerSleep = null
+
+					if( State_Away.state == OFF )
+					{
+						postUpdate(State_Sleeping, ON)
+					}
+				]
+			}
+		}
+	}
+end

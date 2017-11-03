@@ -1,0 +1,13 @@
+/* File: 			YahooWeather.things
+ * Autor: 			Andreas Lechner
+ * Company: 		IT Lechner
+ * Date:			26-10-2017
+ * Info:			http://www.lechnerandreas.com
+ * Description: 	DE:		In dieser Datei werden die Things für Astro definiert 
+ * 					EN:		This file contains things definitions for Astro
+ */
+
+// Astro Thing Definition Aschaffenburg
+astro:sun:Feldkahl  [ geolocation="50.043173, 9.211972,100", interval=60 ]
+astro:moon:Feldkahl [ geolocation="50.043173, 9.211972,100", interval=60 ]
+

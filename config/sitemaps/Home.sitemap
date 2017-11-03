@@ -1,0 +1,74 @@
+sitemap Home label="Home"		{
+  		
+  		Frame label="Haus" icon="house" {
+				Group item=gDach label="Dachgeschoss" icon="attic"
+				Group item=gOG label="Obergeschoss" icon="firstfloor"
+				Group item=gEG label="Erdgeschoss" icon="groundfloor"
+				Group item=gKeller label="Untergeschoss" icon="cellar"		
+				Group item=gGarten label="Garten" icon="garden"
+		}
+		Frame label="Schalter" {
+  				Switch item=NormallyClosedRelay label="Schalter"
+  		}  		
+  		Frame label="Astronomische Daten" {
+  				Group item=gAstro label="Astronomische Daten"
+  		}
+ 		Frame label="Info" {
+  				Group item=gInfo label="Informationen"
+  		}
+ 		Frame label="Sicherheit" {
+  				Group item=gSicherheit label="Sicherheit"
+  		}
+  		Frame label="News" {
+  				Group item=gNews label="Neuigkeiten"
+  		}
+  		Frame label="FritzBox" {
+  				Group item=gFritz label="FritzBox Informationen"
+  				Group item=gWifi label="Wifi Informationen"
+  				Group item=gTelefon label="Telefon Informationen"
+  				Group item=gNetzwerk label="Netzwerk Informationen"
+  				
+  		}
+ 		Frame label="Datum/Zeit" 	{
+ 				Text item=DateTime_DatumZeitAktuell label="Wochentag & Datum"
+ 				Text item=String_ZeitLokal icon="time" label="Uhrzeit"				
+ 		}
+ 		// Frame Yahoo Wetter Aschaffenburg
+ 		Frame label= "Wetter Aschaffenburg" 	{
+ 				Text item=LdkAburg_Temperatur icon="temperature" valuecolor=[>25="red",>15="green",>5="orange",<5="blue"]
+ 				Text item=LdkAburg_Feuchtigkeit icon="rain"
+ 				Text item=LdkAburg_Luftdruck icon="sun_clouds"
+ 		}
+ 		Frame label= "Anwesend" { 		
+ 				Text item=HandyTrickOnline icon="boy_1" label="Andy @ Home"
+ 				Text item=HandyHansOnline icon="man_1" label="Papa @ Home"
+ 				Text item=HandyHerthaOnline icon="woman_1" label="Mama @ Home"		
+ 		}
+ 		Frame label= "Anruferdaten" { 
+ 				Text item=FritzNeueNachricht label="Neue Nachrichten auf AB"
+ 				Text item=FritzVerpassteAnrufe label="Verpasste Anrufe"	
+ 		} 
+ 		Frame label= "Astrodaten" {
+		 		
+		//Switch item=Night_State label="Phase of Day" mappings=[OFF="Tag", ON="Nacht"]
+		        Text item=Tageszeit icon="sunmoon"
+		        Text item=SonnenAufgangStart icon="sunrise" visibility=[Nacht_Status == ON]
+		        Text item=SonnenUntergangEnde icon="sunset" visibility=[Nacht_Status == OFF]
+		        Text item=Abends icon="night"
+		        Text item=Aktueller_Sonnenstand icon="sunmoon" visibility=[Aktueller_Sonnenstand > 0]
+		        Text item=Aktueller_Mondstand icon="sunmoon" visibility=[Aktueller_Mondstand > 0]
+		        Text item=Sternzeichen icon="zodiac"
+		        Text item=MondPhase
+		        Text item=MondEntfernung
+		        Text item=Vollmond icon="fullmoon"
+		              visibility=[MondPhase == WAXING_CRESCENT,
+			                        MondPhase == FIRST_QUARTER,
+			                        MondPhase == WAXING_GIBBOUS,
+			                        MondPhase == FULL]
+	            Text item=Neumond icon="fullmoon"
+	                  visibility=[MondPhase == WANING_GIBBOUS,
+			                        MondPhase == THIRD_QUARTER,
+			                        MondPhase == WANING_CRESCENT,
+			                        MondPhase == NEW]       		
+        }
+}

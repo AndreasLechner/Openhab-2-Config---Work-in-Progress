@@ -1,0 +1,2 @@
+Switch fPower "Funksteckdose1" {culintertechno="type=raw;address=00000FFF0F;commandOn=FF;commandOff=F0"} 
+Switch fPower2 "Funksteckdose2" {culintertechno="type=raw;address=000FFF0FFF;commandOn=FF;commandOff=F0"}

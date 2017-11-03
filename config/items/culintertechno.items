@@ -1,0 +1,14 @@
+/* File: 			culintertechno.items
+ * Autor: 			Andreas Lechner
+ * Company: 		IT Lechner
+ * Date:			31-10-2017
+ * Info:			http://www.lechnerandreas.com
+ * Description: 	DE:		In dieser Datei werden die CulIntertechno Items definiert 
+ * 					EN:		This file contains the culintertechno items definitions
+ */
+
+/* CULINTERTECHNO ITEM DEFINITION */
+
+/* Intertechno Licht/Schalter */
+/************************************************************************************/
+Switch SchalterA 		"Schalter A" 		(gSchalter) 	{ culintertechno="type=raw;address=0F00F0000F;commandOn=FF;commandOff=F0" }
